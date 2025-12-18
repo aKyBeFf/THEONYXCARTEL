@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ONYX CARTEL | Winter Management</title>
+    <style>
+        body { 
+            background-color: #0b0b0b; 
+            color: #e0e0e0; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+            position: relative;
+        }
+
+        /* СНЕГ */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* КАРТОЧКА */
+        .form-card { 
+            background: rgba(20, 20, 20, 0.95); 
+            border: 1px solid #333; 
+            padding: 40px; 
+            border-radius: 15px; 
+            width: 450px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
+            z-index: 10; 
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { text-align: center; color: #fff; letter-spacing: 4px; margin: 0; text-transform: uppercase; }
+        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 30px; letter-spacing: 2px; }
+        
+        label { display: block; margin-top: 20px; font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; background: #1d1d1d; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; font-size: 14px; }
+        
+        select:disabled { background: #141414; color: #00ff00; border-color: #222; cursor: not-allowed; opacity: 1; }
+        
+        input:focus, select:focus:not(:disabled) { border-color: #777; background: #222; }
+        
+        button { width: 100%; padding: 15px; margin-top: 35px; background: #fff; border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        button:hover { background: #bbb; transform: translateY(-2px); }
+        
+        /* МОДАЛЬНОЕ ОКНО */
+        #modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
+        .modal { background: #1a1a1a; border: 1px solid #444; padding: 40px; border-radius: 10px; text-align: center; width: 320px; transform: scale(0.7); transition: 0.3s; }
+        .modal.active { transform: scale(1); }
+        .modal-icon { font-size: 50px; color: #fff; margin-bottom: 20px; }
+        .modal-text { font-size: 16px; color: #e0e0e0; margin-bottom: 25px; }
+        .modal-btn { background: #fff; color: #000; border: none; padding: 10px 40px; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
+
+        .branding { text-align: center; font-size: 9px; margin-top: 25px; color: #444; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div id="snow-container"></div>
+
+<div class="form-card">
+    <h2>⦉ ◈ ONYX ◈ ⦊</h2>
+    <div class="subtitle">AUTOMATED RANK SYSTEM</div>
+    
+    <form id="rankForm">
+        <label>Имя и Фамилия (на русском)</label>
+        <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
+
+        <label>Ваш текущий ранг</label>
+        <select id="currentRank" onchange="updateNextRank()" required>
+            <option value="" disabled selected>Выберите из списка...</option>
+            <option value="1">1 | С Ы Р Ь Е</option>
+            <option value="2">2 | О С К О Л О К</option>
+            <option value="3">3 | Ю В Е Л И Р</option>
+            <option value="4">4 | Г Р А В И Р О В Щ И К</option>
+            <option value="5">5 | К А Р А Т</option>
+            <option value="6">6 | О К У Л И С Т</option>
+            <option value="7">7 | М А С Т Е Р</option>
+        </select>
+
+        <label>Вы будете повышены на:</label>
+        <select id="newRank" disabled>
+            <option value="">Ожидание выбора...</option>
+        </select>
+
+        <label>Ссылка на отчет</label>
+        <input type="url" id="evidence" placeholder="https://imgur.com/..." required>
+
+        <button type="submit">Отправить в архив</button>
+    </form>
+    <div class="branding">THE ONYX CARTEL | SECURED SYSTEM</div>
+</div>
+
+<div id="modalOverlay">
+    <div class="modal" id="successModal">
+        <div class="modal-icon">❄</div>
+        <div class="modal-text">Ваш отчет успешно отправлен на стол к руководству!</div>
+        <button class="modal-btn" onclick="closeModal()">Хорошо!</button>
+    </div>
+</div>
+
+<script>
+    const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
+
+    const ranks = {
+        "1": "2 | О С К О Л О К",
+        "2": "3 | Ю В Е Л И Р",
+        "3": "4 | Г Р А В И Р О В Щ И К",
+        "4": "5 | К А Р А Т",
+        "5": "6 | О К У Л И С Т",
+        "6": "7 | М А С Т Е Р",
+        "7": "8 | Б Е З У П Р Е Ч Н Ы Й"
+    };
+
+    const currentNames = {
+        "1": "1 | С Ы Р Ь Е",
+        "2": "2 | О С К О Л О К",
+        "3": "3 | Ю В Е Л И Р",
+        "4": "4 | Г Р А В И Р О В Щ И К",
+        "5": "5 | К А Р А Т",
+        "6": "6 | О К У Л И С Т",
+        "7": "7 | М А С Т Е Р"
+    };
+
+    function updateNextRank() {
+        const currentVal = document.getElementById('currentRank').value;
+        const nextRankSelect = document.getElementById('newRank');
+        
+        nextRankSelect.innerHTML = "";
+        
+        if (ranks[currentVal]) {
+            const option = document.createElement('option');
+            option.value = ranks[currentVal];
+            option.text = ranks[currentVal];
+            option.selected = true;
+            nextRankSelect.appendChild(option);
+        }
+    }
+
+    function createSnowflake() {
+        const snow = document.createElement('div');
+        snow.className = 'snowflake';
+        snow.style.left = Math.random() * 100 + 'vw';
+        snow.style.width = Math.random() * 4 + 2 + 'px';
+        snow.style.height = snow.style.width;
+        snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+        snow.style.opacity = Math.random();
+        document.body.appendChild(snow);
+        setTimeout(() => snow.remove(), 5000);
+    }
+    setInterval(createSnowflake, 100);
+
+    const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('successModal');
+
+    function openModal() {
+        overlay.style.display = 'flex';
+        setTimeout(() => modal.classList.add('active'), 10);
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        setTimeout(() => overlay.style.display = 'none', 300);
+    }
+
+    document.getElementById('rankForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const curId = document.getElementById('currentRank').value;
+        const targetRank = document.getElementById('newRank').value;
+        const fullname = document.getElementById('fullname').value;
+
+        const data = {
+            username: "Система Повышений ONYX",
+            embeds: [{
+                title: "❄️ НОВЫЙ ОТЧЕТ С САЙТА",
+                color: 0xffffff,
+                fields: [
+                    { name: "👤 Имя Фамилия", value: `**${fullname}**`, inline: false },
+                    { name: "📉 Текущий ранг", value: currentNames[curId], inline: true },
+                    { name: "📈 Новый ранг", value: targetRank, inline: true },
+                    { name: "🔗 Доказательства", value: `[Открыть отчет](${document.getElementById('evidence').value})`, inline: false }
+                ],
+                footer: { text: "The Onyx Cartel • Winter 2025" },
+                timestamp: new Date()
+            }]
+        };
+
+        fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(() => {
+            openModal();
+            document.getElementById('rankForm').reset();
+            document.getElementById('newRank').innerHTML = '<option value="">Ожидание выбора...</option>';
+        }).catch(() => alert('Ошибка. Проверь Webhook URL!'));
+    });
+</script>
+
+</body>
+</html>
