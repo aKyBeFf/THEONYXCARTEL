@@ -5,67 +5,55 @@
     <title>ONYX CARTEL | Winter Management</title>
     <style>
         body { 
-            background-color: #0b0b0b; 
-            color: #e0e0e0; 
+            background-color: #0b0b0b; color: #e0e0e0; 
             font-family: 'Segoe UI', Tahoma, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            overflow: hidden; 
-            position: relative;
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; overflow: hidden; position: relative;
         }
 
         /* СНЕГ */
-        .snowflake {
-            position: absolute;
-            top: -10px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0.8;
-            pointer-events: none;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            to { transform: translateY(105vh); }
-        }
+        .snowflake { position: absolute; top: -10px; background: #fff; border-radius: 50%; opacity: 0.8; pointer-events: none; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(105vh); } }
 
         /* КАРТОЧКА */
         .form-card { 
-            background: rgba(20, 20, 20, 0.95); 
-            border: 1px solid #333; 
-            padding: 40px; 
-            border-radius: 15px; 
-            width: 450px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8); 
-            z-index: 10; 
-            backdrop-filter: blur(10px);
+            background: rgba(20, 20, 20, 0.95); border: 1px solid #333; 
+            padding: 40px; border-radius: 15px; width: 450px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 10; backdrop-filter: blur(10px);
         }
 
         h2 { text-align: center; color: #fff; letter-spacing: 4px; margin: 0; text-transform: uppercase; }
-        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 30px; letter-spacing: 2px; }
+        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; letter-spacing: 2px; }
         
-        label { display: block; margin-top: 20px; font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; background: #1d1d1d; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.3s; font-size: 14px; }
+        /* ПРОФИЛЬ ДИСКОРДА */
+        .discord-auth-zone {
+            background: #1a1c1e; border: 1px dashed #444; padding: 15px;
+            border-radius: 10px; text-align: center; margin-bottom: 20px;
+        }
+        .user-info { display: none; align-items: center; justify-content: center; gap: 15px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #5865F2; }
+        .user-name { font-weight: bold; color: #fff; }
         
-        select:disabled { background: #141414; color: #00ff00; border-color: #222; cursor: not-allowed; opacity: 1; }
+        .btn-discord { 
+            background: #5865F2; color: #fff; border: none; padding: 10px 20px; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .btn-discord:hover { background: #4752C4; }
+
+        label { display: block; margin-top: 15px; font-size: 11px; color: #aaa; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; background: #1d1d1d; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; outline: none; }
+        select:disabled { background: #141414; color: #00ff00; opacity: 1; }
         
-        input:focus, select:focus:not(:disabled) { border-color: #777; background: #222; }
-        
-        button { width: 100%; padding: 15px; margin-top: 35px; background: #fff; border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        button:hover { background: #bbb; transform: translateY(-2px); }
-        
-        /* МОДАЛЬНОЕ ОКНО */
+        .submit-btn { width: 100%; padding: 15px; margin-top: 25px; background: #fff; border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; transition: 0.3s; }
+        .submit-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* МОДАЛКА */
         #modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
         .modal { background: #1a1a1a; border: 1px solid #444; padding: 40px; border-radius: 10px; text-align: center; width: 320px; transform: scale(0.7); transition: 0.3s; }
         .modal.active { transform: scale(1); }
-        .modal-icon { font-size: 50px; color: #fff; margin-bottom: 20px; }
-        .modal-text { font-size: 16px; color: #e0e0e0; margin-bottom: 25px; }
-        .modal-btn { background: #fff; color: #000; border: none; padding: 10px 40px; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
+        .modal-btn { background: #fff; color: #000; border: none; padding: 10px 40px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; }
 
-        .branding { text-align: center; font-size: 9px; margin-top: 25px; color: #444; letter-spacing: 1px; }
+        .branding { text-align: center; font-size: 9px; margin-top: 25px; color: #444; }
     </style>
 </head>
 <body>
@@ -74,15 +62,27 @@
 
 <div class="form-card">
     <h2>⦉ ◈ ONYX ◈ ⦊</h2>
-    <div class="subtitle">AUTOMATED RANK SYSTEM</div>
+    <div class="subtitle">SECURE AUTHENTICATION</div>
+
+    <div class="discord-auth-zone" id="authZone">
+        <div id="loginPrompt">
+            <p style="font-size: 12px; margin-bottom: 10px;">Для подачи анкеты нужно авторизоваться</p>
+            <button class="btn-discord" onclick="loginDiscord()">Войти через Discord</button>
+        </div>
+        <div class="user-info" id="userInfo">
+            <img src="" id="userAvatar" class="user-avatar">
+            <span id="userName" class="user-name"></span>
+            <button onclick="logout()" style="background:none; border:none; color:#ff4d4d; cursor:pointer; font-size:10px;">[Выйти]</button>
+        </div>
+    </div>
     
     <form id="rankForm">
         <label>Имя и Фамилия (на русском)</label>
-        <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
+        <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required disabled>
 
-        <label>Ваш текущий ранг</label>
-        <select id="currentRank" onchange="updateNextRank()" required>
-            <option value="" disabled selected>Выберите из списка...</option>
+        <label>Текущий ранг</label>
+        <select id="currentRank" onchange="updateNextRank()" required disabled>
+            <option value="" disabled selected>Сначала войдите в Discord</option>
             <option value="1">1 | С Ы Р Ь Е</option>
             <option value="2">2 | О С К О Л О К</option>
             <option value="3">3 | Ю В Е Л И Р</option>
@@ -92,125 +92,123 @@
             <option value="7">7 | М А С Т Е Р</option>
         </select>
 
-        <label>Вы будете повышены на:</label>
+        <label>Доступное повышение</label>
         <select id="newRank" disabled>
-            <option value="">Ожидание выбора...</option>
+            <option value="">Ожидание...</option>
         </select>
 
         <label>Ссылка на отчет</label>
-        <input type="url" id="evidence" placeholder="https://imgur.com/..." required>
+        <input type="url" id="evidence" placeholder="https://imgur.com/..." required disabled>
 
-        <button type="submit">Отправить в архив</button>
+        <button type="submit" id="submitBtn" class="submit-btn" disabled>Отправить в архив</button>
     </form>
-    <div class="branding">THE ONYX CARTEL | SECURED SYSTEM</div>
+    <div class="branding">© THE ONYX CARTEL | Winter 2025</div>
 </div>
 
 <div id="modalOverlay">
     <div class="modal" id="successModal">
-        <div class="modal-icon">❄</div>
-        <div class="modal-text">Ваш отчет успешно отправлен на стол к руководству!</div>
+        <div class="modal-icon" style="font-size: 50px; margin-bottom: 20px;">❄</div>
+        <div class="modal-text">Отчет отправлен!</div>
         <button class="modal-btn" onclick="closeModal()">Хорошо!</button>
     </div>
 </div>
 
 <script>
     const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
+    
+    // ДАННЫЕ ДЛЯ АВТОРИЗАЦИИ (ЗАПОЛНИ ПО ИНСТРУКЦИИ НИЖЕ)
+    const CLIENT_ID = '1451284313109954650'; 
+    const REDIRECT_URI = window.location.href.split('#')[0]; // Автоматически берет адрес сайта
 
-    const ranks = {
-        "1": "2 | О С К О Л О К",
-        "2": "3 | Ю В Е Л И Р",
-        "3": "4 | Г Р А В И Р О В Щ И К",
-        "4": "5 | К А Р А Т",
-        "5": "6 | О К У Л И С Т",
-        "6": "7 | М А С Т Е Р",
-        "7": "8 | Б Е З У П Р Е Ч Н Ы Й"
-    };
+    let userData = null;
 
-    const currentNames = {
-        "1": "1 | С Ы Р Ь Е",
-        "2": "2 | О С К О Л О К",
-        "3": "3 | Ю В Е Л И Р",
-        "4": "4 | Г Р А В И Р О В Щ И К",
-        "5": "5 | К А Р А Т",
-        "6": "6 | О К У Л И С Т",
-        "7": "7 | М А С Т Е Р"
-    };
+    // 1. ЛОГИКА АВТОРИЗАЦИИ
+    function loginDiscord() {
+        const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+        window.location.href = url;
+    }
+
+    function handleAuth() {
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get('access_token');
+
+        if (accessToken) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                userData = data;
+                showUser(data);
+                enableForm();
+            });
+            window.history.replaceState({}, document.title, REDIRECT_URI);
+        }
+    }
+
+    function showUser(user) {
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'flex';
+        document.getElementById('userName').innerText = `${user.username}#${user.discriminator || '0'}`;
+        document.getElementById('userAvatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+    }
+
+    function enableForm() {
+        document.querySelectorAll('#rankForm input, #rankForm select, #rankForm button').forEach(el => el.disabled = false);
+        document.getElementById('newRank').disabled = true; // Оставляем его только для чтения
+    }
+
+    function logout() {
+        window.location.reload();
+    }
+
+    // 2. ЛОГИКА ФОРМЫ
+    const ranks = { "1":"2 | О С К О Л О К", "2":"3 | Ю В Е Л И Р", "3":"4 | Г Р А В И Р О В Щ И К", "4":"5 | К А Р А Т", "5":"6 | О К У Л И С Т", "6":"7 | М А С Т Е Р", "7":"8 | Б Е З У П Р Е Ч Н Ы Й" };
+    const currentNames = { "1":"1 | С Ы Р Ь Е", "2":"2 | О С К О Л О К", "3":"3 | Ю В Е Л И Р", "4":"4 | Г Р А В И Р О В Щ И К", "5":"5 | К А Р А Т", "6":"6 | О К У Л И С Т", "7":"7 | М А С Т Е Р" };
 
     function updateNextRank() {
         const currentVal = document.getElementById('currentRank').value;
         const nextRankSelect = document.getElementById('newRank');
-        
         nextRankSelect.innerHTML = "";
-        
         if (ranks[currentVal]) {
             const option = document.createElement('option');
-            option.value = ranks[currentVal];
-            option.text = ranks[currentVal];
-            option.selected = true;
+            option.value = ranks[currentVal]; option.text = ranks[currentVal]; option.selected = true;
             nextRankSelect.appendChild(option);
         }
     }
 
-    function createSnowflake() {
-        const snow = document.createElement('div');
-        snow.className = 'snowflake';
-        snow.style.left = Math.random() * 100 + 'vw';
-        snow.style.width = Math.random() * 4 + 2 + 'px';
-        snow.style.height = snow.style.width;
-        snow.style.animationDuration = Math.random() * 3 + 2 + 's';
-        snow.style.opacity = Math.random();
-        document.body.appendChild(snow);
-        setTimeout(() => snow.remove(), 5000);
-    }
-    setInterval(createSnowflake, 100);
-
-    const overlay = document.getElementById('modalOverlay');
-    const modal = document.getElementById('successModal');
-
-    function openModal() {
-        overlay.style.display = 'flex';
-        setTimeout(() => modal.classList.add('active'), 10);
-    }
-
-    function closeModal() {
-        modal.classList.remove('active');
-        setTimeout(() => overlay.style.display = 'none', 300);
-    }
-
+    // 3. ОТПРАВКА
     document.getElementById('rankForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const curId = document.getElementById('currentRank').value;
-        const targetRank = document.getElementById('newRank').value;
-        const fullname = document.getElementById('fullname').value;
-
         const data = {
-            username: "Система Повышений ONYX",
+            username: "Система Верификации ONYX",
             embeds: [{
-                title: "❄️ НОВЫЙ ОТЧЕТ С САЙТА",
-                color: 0xffffff,
+                title: "❄️ НОВЫЙ ВЕРИФИЦИРОВАННЫЙ ОТЧЕТ",
+                color: 0x5865F2,
+                thumbnail: { url: `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` },
                 fields: [
-                    { name: "👤 Имя Фамилия", value: `**${fullname}**`, inline: false },
-                    { name: "📉 Текущий ранг", value: currentNames[curId], inline: true },
-                    { name: "📈 Новый ранг", value: targetRank, inline: true },
-                    { name: "🔗 Доказательства", value: `[Открыть отчет](${document.getElementById('evidence').value})`, inline: false }
+                    { name: "🔑 Discord Аккаунт", value: `<@${userData.id}> (${userData.username})`, inline: false },
+                    { name: "👤 Имя в игре", value: document.getElementById('fullname').value, inline: false },
+                    { name: "📉 Ранг", value: `${currentNames[document.getElementById('currentRank').value]} → ${document.getElementById('newRank').value}`, inline: false },
+                    { name: "🔗 Отчет", value: `[Открыть](${document.getElementById('evidence').value})`, inline: false }
                 ],
-                footer: { text: "The Onyx Cartel • Winter 2025" },
+                footer: { text: `ID Пользователя: ${userData.id}` },
                 timestamp: new Date()
             }]
         };
 
-        fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(() => {
-            openModal();
-            document.getElementById('rankForm').reset();
-            document.getElementById('newRank').innerHTML = '<option value="">Ожидание выбора...</option>';
-        }).catch(() => alert('Ошибка. Проверь Webhook URL!'));
+        fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(() => { openModal(); document.getElementById('rankForm').reset(); });
     });
-</script>
 
+    // Снег и модалка (старые функции)
+    function createSnowflake() { const snow = document.createElement('div'); snow.className = 'snowflake'; snow.style.left = Math.random() * 100 + 'vw'; snow.style.width = Math.random() * 4 + 2 + 'px'; snow.style.height = snow.style.width; snow.style.animationDuration = Math.random() * 3 + 2 + 's'; document.body.appendChild(snow); setTimeout(() => snow.remove(), 5000); }
+    setInterval(createSnowflake, 100);
+    function openModal() { document.getElementById('modalOverlay').style.display = 'flex'; setTimeout(() => document.getElementById('successModal').classList.add('active'), 10); }
+    function closeModal() { document.getElementById('successModal').classList.remove('active'); setTimeout(() => document.getElementById('modalOverlay').style.display = 'none', 300); }
+
+    window.onload = handleAuth;
+</script>
 </body>
 </html>
