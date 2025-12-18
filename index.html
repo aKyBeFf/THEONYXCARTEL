@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>ONYX CARTEL | Management</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/ZdWV9GS.png">
+    <title>THE ONYX CARTEL</title>
     <style>
         body { 
             background-color: #0b0b0b; color: #e0e0e0; 
@@ -20,8 +21,15 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 10; backdrop-filter: blur(10px); margin: 20px 0;
         }
 
-        h2 { text-align: center; color: #fff; letter-spacing: 4px; margin: 0; text-transform: uppercase; }
-        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; letter-spacing: 2px; }
+        .logo-img {
+            display: block;
+            margin: 0 auto 15px auto; 
+            max-width: 180px; 
+            height: auto;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+        }
+
+        .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
         
         .discord-auth-zone { background: #1a1c1e; border: 1px dashed #444; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
         .user-info { display: none; align-items: center; justify-content: center; gap: 15px; }
@@ -46,7 +54,6 @@
         .submit-btn { width: 100%; padding: 15px; margin-top: 25px; background: #fff; border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; transition: 0.3s; }
         .submit-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        /* МОДАЛКА */
         #modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
         .modal { background: #1a1a1a; border: 1px solid #444; padding: 40px; border-radius: 10px; text-align: center; width: 320px; transform: scale(0.7); transition: 0.3s; }
         .modal.active { transform: scale(1); }
@@ -60,8 +67,9 @@
 <div id="snow-container"></div>
 
 <div class="form-card">
-    <h2>⦉ ◈ ONYX ◈ ⦊</h2>
-    <div class="subtitle">ADVANCED REPORT SYSTEM</div>
+    <img src="https://i.imgur.com/ZdWV9GS.png" alt="ONYX Logo" class="logo-img">
+    
+    <div class="subtitle">THE ONYX CARTEL</div>
 
     <div class="discord-auth-zone" id="authZone">
         <div id="loginPrompt">
@@ -82,13 +90,12 @@
         <label>Текущий ранг</label>
         <select id="currentRank" onchange="updateNextRank()" required disabled>
             <option value="" disabled selected>Сначала войдите в Discord</option>
-            <option value="1">1 | С Ы Р Ь Е</option>
-            <option value="2">2 | О С К О Л О К</option>
-            <option value="3">3 | Ю В Е Л И Р</option>
-            <option value="4">4 | Г Р А В И Р О В Щ И К</option>
-            <option value="5">5 | К А Р А Т</option>
-            <option value="6">6 | О К У Л И С Т</option>
-            <option value="7">7 | М А С Т Е Р</option>
+            <option value="1">1 | Сокол</option>
+            <option value="2">2 | Посыльный</option>
+            <option value="3">3 | Сикарио</option>
+            <option value="4">4 | Стрелок</option>
+            <option value="5">5 | Сборщик</option>
+            <option value="6">6 | Оператор</option>
         </select>
 
         <label>Доступное повышение</label>
@@ -110,14 +117,13 @@
 
 <div id="modalOverlay">
     <div class="modal" id="successModal">
-        <div class="modal-icon" style="font-size: 50px; margin-bottom: 20px;">❄</div>
+        <img src="https://i.imgur.com/ZdWV9GS.png" alt="ONYX Logo" style="width: 80px; margin-bottom: 20px;">
         <div class="modal-text">Отчет успешно отправлен!</div>
         <button class="modal-btn" onclick="closeModal()">Хорошо!</button>
     </div>
 </div>
 
 <script>
- 
     const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU'; 
     const CLIENT_ID = '1451284313109954650';
     const REDIRECT_URI = window.location.href.split('#')[0];
@@ -125,11 +131,9 @@
     let userData = null;
     let evidenceLinks = []; 
 
-
     function addLink() {
         const input = document.getElementById('linkInput');
         const url = input.value.trim();
-
         if (url) {
             evidenceLinks.push(url);
             renderLinks();
@@ -140,14 +144,13 @@
     }
 
     function removeLink(index) {
-        evidenceLinks.splice(index, 1);
-        renderLinks();
+        evidenceLinks.splice(index, 1); 
+        renderLinks(); 
     }
 
     function renderLinks() {
         const container = document.getElementById('linksContainer');
-        container.innerHTML = '';
-
+        container.innerHTML = ''; 
         evidenceLinks.forEach((link, index) => {
             const div = document.createElement('div');
             div.className = 'link-item';
@@ -167,7 +170,6 @@
     function handleAuth() {
         const fragment = new URLSearchParams(window.location.hash.slice(1));
         const accessToken = fragment.get('access_token');
-
         if (accessToken) {
             fetch('https://discord.com/api/users/@me', {
                 headers: { Authorization: `Bearer ${accessToken}` }
@@ -199,23 +201,45 @@
 
     function logout() { window.location.reload(); }
 
-    const ranks = { "1":"2 | О С К О Л О К", "2":"3 | Ю В Е Л И Р", "3":"4 | Г Р А В И Р О В Щ И К", "4":"5 | К А Р А Т", "5":"6 | О К У Л И С Т", "6":"7 | М А С Т Е Р", "7":"8 | Б Е З У П Р Е Ч Н Ы Й" };
-    const currentNames = { "1":"1 | С Ы Р Ь Е", "2":"2 | О С К О Л О К", "3":"3 | Ю В Е Л И Р", "4":"4 | Г Р А В И Р О В Щ И К", "5":"5 | К А Р А Т", "6":"6 | О К У Л И С Т", "7":"7 | М А С Т Е Р" };
+    const ranks = { 
+        "1": "2 | Посыльный", 
+        "2": "3 | Сикарио", 
+        "3": "4 | Стрелок", 
+        "4": "5 | Сборщик", 
+        "5": "6 | Оператор", 
+        "6": "7 | Лейтенант" 
+    };
+
+    const currentNames = { 
+        "1": "1 | Сокол", 
+        "2": "2 | Посыльный", 
+        "3": "3 | Сикарио", 
+        "4": "4 | Стрелок", 
+        "5": "5 | Сборщик", 
+        "6": "6 | Оператор",
+        "7": "7 | Лейтенант"
+    };
 
     function updateNextRank() {
         const currentVal = document.getElementById('currentRank').value;
         const nextRankSelect = document.getElementById('newRank');
         nextRankSelect.innerHTML = "";
+        
         if (ranks[currentVal]) {
             const option = document.createElement('option');
-            option.value = ranks[currentVal]; option.text = ranks[currentVal]; option.selected = true;
+            option.value = ranks[currentVal]; 
+            option.text = ranks[currentVal]; 
+            option.selected = true;
+            nextRankSelect.appendChild(option);
+        } else {
+            const option = document.createElement('option');
+            option.text = "Максимальный уровень / Спец. решение"; 
             nextRankSelect.appendChild(option);
         }
     }
 
     document.getElementById('rankForm').addEventListener('submit', function(e) {
         e.preventDefault();
-
         if (evidenceLinks.length === 0) {
             alert("Вы не добавили ни одной ссылки на доказательства! Нажмите '+' после ввода ссылки.");
             return;
@@ -224,18 +248,19 @@
         const linksFormatted = evidenceLinks.map((link, i) => `[Доказательство ${i+1}](${link})`).join('\n');
 
         const data = {
-            username: "Система Верификации ONYX",
+            username: "Onyx Cartel System",
             embeds: [{
-                title: "❄️ НОВЫЙ ВЕРИФИЦИРОВАННЫЙ ОТЧЕТ",
-                color: 0x5865F2,
+                title: "💀 НОВЫЙ ОТЧЕТ: ПОВЫШЕНИЕ",
+                color: 0x99aab5,
                 thumbnail: { url: `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` },
+                image: { url: "https://i.imgur.com/ZdWV9GS.png" }, 
                 fields: [
-                    { name: "🔑 Discord Аккаунт", value: `<@${userData.id}> (${userData.username})`, inline: false },
-                    { name: "👤 Имя в игре", value: `**${document.getElementById('fullname').value}**`, inline: false },
-                    { name: "📉 Ранг", value: `${currentNames[document.getElementById('currentRank').value]} → ${document.getElementById('newRank').value}`, inline: false },
-                    { name: "🔗 Доказательства", value: linksFormatted, inline: false }
+                    { name: "👤 Агент (Discord)", value: `<@${userData.id}>`, inline: true },
+                    { name: "🏷 Имя", value: `**${document.getElementById('fullname').value}**`, inline: true },
+                    { name: "📈 Прогресс", value: `${currentNames[document.getElementById('currentRank').value]} ➡ ${document.getElementById('newRank').value}`, inline: false },
+                    { name: "📎 Материалы дела", value: linksFormatted, inline: false }
                 ],
-                footer: { text: `ID: ${userData.id}` },
+                footer: { text: `ID: ${userData.id} | Cartel Management` },
                 timestamp: new Date()
             }]
         };
@@ -244,8 +269,8 @@
         .then(() => { 
             openModal(); 
             document.getElementById('rankForm').reset();
-            evidenceLinks = []; // Очистить массив ссылок
-            renderLinks(); // Очистить визуал
+            evidenceLinks = []; 
+            renderLinks(); 
         });
     });
 
