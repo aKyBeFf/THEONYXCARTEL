@@ -4,8 +4,8 @@ const CLIENT_ID = '1451284313109954650';
 const GUILD_ID = '1451234520006266933';
 const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
 
-const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
-const WEBHOOK_BLACKLIST = 'https://discord.com/channels/1451234520006266933/1451237366441181428';
+const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
+const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
 
 const BOT_API_URL = 'https://onyx-cartel-system.discloud.app/api/players'; 
 
@@ -259,4 +259,5 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
+
 
