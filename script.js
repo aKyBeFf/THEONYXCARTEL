@@ -9,7 +9,7 @@ const WEBHOOK_BLACKLIST = 'https://discord.com/channels/1451234520006266933/1451
 
 const BOT_API_URL = 'https://onyx-cartel-system.discloud.app/api/players'; 
 
-const REDIRECT_URI = window.location.href.split('#')[0];
+const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
 let userData = null;
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -259,3 +259,4 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
+
