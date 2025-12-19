@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0b0b; 
+}
+::-webkit-scrollbar-thumb {
+    background: #333; 
+    border-radius: 5px; 
+    border: 2px solid #0b0b0b;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+
+html { overflow-y: scroll; }
+
+body { 
+    background-color: #0b0b0b; 
+    color: #e0e0e0; 
+    font-family: 'Inter', sans-serif; 
+    display: flex; justify-content: center; align-items: center; 
+    min-height: 100vh; margin: 0; position: relative;
+    overflow-x: hidden; 
+}
+
+#snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.snowflake { position: absolute; top: -10px; background: #fff; border-radius: 50%; opacity: 0.8; pointer-events: none; animation: fall linear infinite; }
+@keyframes fall { to { transform: translateY(105vh); } }
+
+.profile-badge {
+    position: fixed; top: 20px; right: 20px;
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid #333;
+    padding: 8px 15px; border-radius: 30px;
+    display: none; align-items: center; gap: 10px;
+    z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    animation: slideInRight 0.8s ease-out;
+}
+@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+.profile-avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #5865F2; }
+.profile-name { font-size: 13px; font-weight: 600; color: #fff; }
+
+.form-card { 
+    background: rgba(20, 20, 20, 0.95); border: 1px solid #333; 
+    padding: 40px; border-radius: 16px; 
+    width: 90%; max-width: 450px; 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9); z-index: 10; 
+    backdrop-filter: blur(10px); margin: 30px 0; 
+}
+
+.logo-img {
+    display: block; margin: 0 auto 15px auto; 
+    max-width: 150px; height: auto; border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 20px; letter-spacing: 3px; text-transform: uppercase; font-weight: 800; }
+
+#loginContainer { text-align: center; padding: 20px 0; animation: fadeIn 0.8s; }
+.login-text { color: #888; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+
+.btn-discord-big {
+    background: #5865F2; color: #fff; border: none; padding: 14px 35px; 
+    border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 15px; 
+    display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3); margin-bottom: 15px;
+    width: 100%; justify-content: center; box-sizing: border-box;
+    transition: all 0.2s ease-out;
+}
+.btn-discord-big:hover { 
+    background: #4752C4; 
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5); 
+}
+.btn-discord-big:active {
+    transform: scale(0.96);
+    transition: all 0.1s ease-out;
+}
+
+#formContainer { 
+    display: none; 
+    overflow: hidden; 
+    animation: smoothReveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes smoothReveal {
+    0% { opacity: 0; max-height: 0; transform: translateY(20px); }
+    100% { opacity: 1; max-height: 850px; transform: translateY(0); }
+}
+
+#rankForm > label, 
+#rankForm > input, 
+#rankForm > select, 
+#rankForm > .link-input-group,
+#rankForm > button {
+    opacity: 0;
+    animation: itemAppear 0.6s ease-out forwards;
+}
+
+@keyframes itemAppear {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#rankForm > *:nth-child(1) { animation-delay: 0.2s; }
+#rankForm > *:nth-child(2) { animation-delay: 0.25s; }
+#rankForm > *:nth-child(3) { animation-delay: 0.3s; }
+#rankForm > *:nth-child(4) { animation-delay: 0.35s; }
+#rankForm > *:nth-child(5) { animation-delay: 0.4s; }
+#rankForm > *:nth-child(6) { animation-delay: 0.45s; }
+#rankForm > *:nth-child(7) { animation-delay: 0.5s; }
+#rankForm > *:nth-child(8) { animation-delay: 0.55s; }
+#rankForm > *:nth-child(9) { animation-delay: 0.6s; }
+#rankForm > *:nth-child(10) { animation-delay: 0.65s; }
+#rankForm > button { animation-delay: 0.8s; }
+
+label { display: block; margin-top: 18px; font-size: 10px; color: #777; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+input, select { width: 100%; padding: 14px; margin-top: 8px; background: #131313; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; transition: border 0.2s; font-family: 'Inter', sans-serif; font-size: 16px; }
+input:focus, select:focus { border-color: #555; }
+
+.link-input-group { display: flex; gap: 10px; margin-top: 8px; }
+
+.btn-add { 
+    background: #28a745; color: #fff; border: none; padding: 0 20px; 
+    border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 20px; 
+    transition: all 0.2s ease-out;
+}
+.btn-add:hover { background: #218838; transform: translateY(-2px); }
+.btn-add:active { transform: scale(0.9); }
+
+.links-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 150px; overflow-y: auto; padding-right: 5px; }
+
+.link-item { background: #1a1a1a; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid #2a2a2a; flex-shrink: 0; animation: itemAppear 0.3s ease-out; }
+.link-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px; color: #4db8ff; }
+.btn-remove { background: transparent; border: none; color: #ff4d4d; cursor: pointer; opacity: 0.7; transition: 0.2s; }
+.btn-remove:hover { opacity: 1; transform: scale(1.1); }
+
+.submit-btn { 
+    width: 100%; padding: 16px; margin-top: 30px; 
+    background: #e0e0e0; border: none; color: #000; 
+    font-weight: 800; cursor: pointer; border-radius: 8px; 
+    text-transform: uppercase; letter-spacing: 1px; 
+    transition: all 0.2s ease-out; 
+}
+.submit-btn:hover { 
+    background: #fff; 
+    box-shadow: 0 0 20px rgba(255,255,255,0.2); 
+    transform: translateY(-3px);
+}
+.submit-btn:active {
+    transform: scale(0.96);
+    transition: all 0.1s ease-out;
+}
+
+#modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(8px); }
+.modal { display: none; background: #141414; border: 1px solid #333; padding: 40px; border-radius: 16px; text-align: center; width: 90%; max-width: 320px; transform: scale(0.9); transition: 0.3s; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+.modal.active { display: block; transform: scale(1); }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; letter-spacing: 2px; color: #fff; }
+.modal-logo-img { width: 80px; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+.modal-btn { 
+    background: #fff; color: #000; border: none; 
+    padding: 12px 40px; border-radius: 6px; cursor: pointer; 
+    font-weight: bold; margin-top: 25px; text-transform: uppercase;
+    transition: all 0.2s ease-out;
+}
+.modal-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+.modal-btn:active { transform: scale(0.95); }
+
+.modal-text { font-size: 14px; color: #ccc; }
+
+.error-text { color: #ff4d4d; }
+.error-icon { width: 60px; height: 60px; border: 2px solid #ff4d4d; color: #ff4d4d; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; font-weight: bold; margin: 0 auto 20px auto; }
+.btn-error { background: #ff4d4d; color: #fff; }
+.btn-error:hover { background: #cc0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+.branding { text-align: center; font-size: 9px; margin-top: 30px; color: #333; font-weight: 600; letter-spacing: 1px; }
+
+@media (max-width: 480px) {
+    .form-card { padding: 25px; margin: 15px auto; width: 85%; }
+    .logo-img { max-width: 120px; }
+    .modal { padding: 30px 20px; }
+    .profile-badge { top: 15px; right: 15px; padding: 6px 12px; }
+    .profile-avatar { width: 30px; height: 30px; }
+    .profile-name { font-size: 11px; }
+}
