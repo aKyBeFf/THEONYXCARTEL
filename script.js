@@ -1,6 +1,6 @@
 const LOGO_URL = 'https://i.imgur.com/I7sZuLM.jpeg';
 
-const CLIENT_ID = '1451347130227757191'; 
+const CLIENT_ID = '1451284313109954650'; 
 const GUILD_ID = '1451234520006266933';
 const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
 
@@ -257,4 +257,5 @@ function createSnowflake() {
     if (container) container.appendChild(snow);
     setTimeout(() => snow.remove(), 5000); 
 }
+
 setInterval(createSnowflake, 100);
