@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="https://i.imgur.com/I7sZuLM.jpeg">
+    <link rel="stylesheet" href="style.css">
+    <title>THE ONYX CARTEL</title>
+</head>
+<body>
+
+<div id="snow-container"></div>
+
+<div id="topProfile" class="profile-badge">
+    <span id="userName" class="profile-name">Загрузка...</span>
+    <img src="" id="userAvatar" class="profile-avatar">
+</div>
+
+<div class="form-card">
+    <img src="" alt="ONYX Logo" class="logo-img" id="mainLogo">
+    <div class="subtitle">THE ONYX CARTEL</div>
+
+    <div id="loginContainer">
+        <p class="login-text">Система повышения и отчетности<br>Требуется авторизация через Discord</p>
+        
+        <button class="btn-discord-big" onclick="loginDiscord()">
+            Войти через Discord
+        </button>
+    </div>
+
+    <div id="formContainer">
+        <form id="rankForm">
+            <label>Имя и Фамилия (на русском)</label>
+            <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
+
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>ID Паспорта</label>
+                    <input type="text" id="passportId" placeholder="123-123" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Возраст (OOC)</label>
+                    <input type="number" id="age" placeholder="16" required>
+                </div>
+            </div>
+
+            <label>Текущий ранг</label>
+            <select id="currentRank" onchange="updateNextRank()" required>
+                <option value="" disabled selected>Выберите ранг...</option>
+                <option value="1">1 | Сокол</option>
+                <option value="2">2 | Посыльный</option>
+                <option value="3">3 | Сикарио</option>
+                <option value="4">4 | Стрелок</option>
+                <option value="5">5 | Сборщик</option>
+                <option value="6">6 | Оператор</option>
+            </select>
+
+            <label>Доступное повышение</label>
+            <select id="newRank" disabled>
+                <option value="">Ожидание...</option>
+            </select>
+
+            <label>Почему вас должны повысить?</label>
+            <textarea id="promoteReason" rows="5" placeholder="Опишите проделанную работу, ваши достижения и почему вы достойны нового ранга..." required></textarea>
+
+            <button type="submit" id="submitBtn" class="submit-btn">Отправить отчет</button>
+        </form>
+
+        <button id="adminBlacklistBtn" class="btn-danger-onyx" style="display: none;" onclick="openModal('blacklistModal')">
+            ⚠️ Управление Черным Списком
+        </button>
+    </div>
+
+    <div class="branding">© THE ONYX CARTEL</div>
+</div>
+
+<div id="modalOverlay">
+    <div class="modal" id="successModal">
+        <img src="" alt="ONYX Logo" id="modalLogo" class="modal-logo-img">
+        <div class="modal-title">УСПЕШНО</div>
+        <div class="modal-text">Данные успешно отправлены.</div>
+        <button class="modal-btn" onclick="closeModal('successModal')">Закрыть</button>
+    </div>
+
+    <div class="modal" id="errorModal">
+        <div class="error-icon">!</div>
+        <div class="modal-title error-text">ОШИБКА</div>
+        <div class="modal-text" id="errorMsgText">Ошибка ввода</div>
+        <button class="modal-btn btn-error" onclick="closeModal('errorModal')">Понял</button>
+    </div>
+
+    <div class="modal" id="blacklistModal" style="max-width: 400px;">
+        <div class="modal-title error-text" style="color: #ff4d4d; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px;">
+            ЧЕРНЫЙ СПИСОК
+        </div>
+        
+        <form id="blacklistForm">
+            <label>Выберите игрока</label>
+            <select id="playerSelect" onchange="fillPlayerData()">
+                <option value="" selected disabled>Загрузка списка...</option>
+                <option value="manual">-- Ввести вручную --</option>
+            </select>
+
+            <input type="text" id="blName" placeholder="Имя нарушителя" required style="margin-top: 10px;">
+            <input type="text" id="blId" placeholder="Статический ID" required>
+            
+            <label>Детали нарушения</label>
+            <input type="text" id="blReason" placeholder="Причина (напр. Слив склада)" required>
+            <input type="text" id="blDuration" placeholder="Срок наказания (напр. 30 дней)" required>
+            
+            <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 20px;">ЗАНЕСТИ В ЧС</button>
+        </form>
+        <button class="modal-btn" onclick="closeModal('blacklistModal')" style="background: transparent; color: #666; margin-top: 5px; border: 1px solid #333; padding: 10px;">Отмена</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
