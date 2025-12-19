@@ -157,19 +157,25 @@ function closeModal(modalId) {
     modal.classList.remove('active'); 
     setTimeout(() => { overlay.style.display = 'none'; }, 300); 
 }
+
+
 function createSnowflake() { 
     const snow = document.createElement('div'); 
     snow.className = 'snowflake'; 
     snow.style.left = Math.random() * 100 + '%'; 
-    snow.style.width = Math.random() * 4 + 2 + 'px'; 
-    snow.style.height = snow.style.width; 
-    snow.style.animationDuration = Math.random() * 3 + 2 + 's'; 
+    
+
+    const size = Math.random() * 15 + 10 + 'px';
+    snow.style.width = size;
+    snow.style.height = size; 
+
+    snow.style.animationDuration = Math.random() * 3 + 3 + 's'; 
     
     const container = document.getElementById('snow-container');
     if (container) {
         container.appendChild(snow);
     }
     
-    setTimeout(() => snow.remove(), 5000); 
+    setTimeout(() => snow.remove(), 6000); 
 }
-setInterval(createSnowflake, 100);
+setInterval(createSnowflake, 150);
