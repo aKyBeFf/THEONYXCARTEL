@@ -37,8 +37,24 @@ body {
     z-index: 1;
 }
 
-.snowflake { position: absolute; top: -10px; background: #fff; border-radius: 50%; opacity: 0.8; pointer-events: none; animation: fall linear infinite; }
-@keyframes fall { to { transform: translateY(105vh); } }
+
+.snowflake { 
+    position: absolute; 
+    top: -30px; 
+
+    
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='2' y1='12' x2='22' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='2' x2='12' y2='22'%3E%3C/line%3E%3Cline x1='20' y1='20' x2='4' y2='4'%3E%3C/line%3E%3Cline x1='4' y1='20' x2='20' y2='4'%3E%3C/line%3E%3C/svg%3E");
+    background-size: contain; 
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    opacity: 0.7; 
+    pointer-events: none; 
+    animation: fall linear infinite; 
+}
+
+@keyframes fall { to { transform: translateY(105vh) rotate(360deg); } } /* Добавил небольшое вращение при падении */
 
 .profile-badge {
     position: fixed; top: 20px; right: 20px;
