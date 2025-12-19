@@ -8,9 +8,7 @@
     <link rel="stylesheet" href="../style.css">
     
     <style>
-        /* === СТИЛИ ЗАГРУЗЧИКА И АДМИНКИ === */
-        
-        /* Экран загрузки */
+
         #loader-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b0b0b;
@@ -36,29 +34,25 @@
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.95); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes blink { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-        /* Основной контент (Скрыт и уменьшен) */
         #admin-content {
             display: none; 
             opacity: 0;
-            transform: scale(0.8); /* Начинает маленьким */
-            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1); /* Красивое расширение */
+            transform: scale(0.8);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
             max-width: 1200px; margin: 40px auto; padding: 20px;
             position: relative; z-index: 10;
         }
 
-        /* Заголовок */
         .db-header { text-align: center; margin-bottom: 40px; }
         .db-title { font-size: 20px; color: #fff; font-weight: 800; letter-spacing: 5px; text-transform: uppercase; }
         .db-subtitle { font-size: 10px; color: #555; letter-spacing: 2px; margin-top: 5px; }
 
-        /* Сетка */
         .reports-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
         }
 
-        /* Карточка */
         .db-card {
             background: rgba(22, 22, 22, 0.95);
             border: 1px solid #333;
@@ -114,14 +108,12 @@
     </div>
 
     <script type="module">
-        // Импортируем из локальной копии конфига
         import { db, collection, query, orderBy, onSnapshot, deleteDoc, doc } from "./firebase-config.js";
 
         const grid = document.getElementById('grid');
         const loader = document.getElementById('loader-screen');
         const content = document.getElementById('admin-content');
 
-        // Подключаемся к базе
         const q = query(collection(db, "reports"), orderBy("timestamp", "desc"));
         
         let isLoaded = false;
@@ -159,31 +151,28 @@
                 grid.innerHTML += card;
             });
 
-            // Если это первая загрузка - запускаем анимацию открытия
             if (!isLoaded) {
                 setTimeout(() => {
                     loader.style.opacity = '0';
-                    loader.style.transform = 'scale(1.1)'; // Эффект исчезновения
+                    loader.style.transform = 'scale(1.1)';
                     setTimeout(() => loader.style.display = 'none', 800);
 
                     content.style.display = 'block';
                     setTimeout(() => {
                         content.style.opacity = '1';
-                        content.style.transform = 'scale(1)'; // Эффект расширения
+                        content.style.transform = 'scale(1)';
                     }, 50);
                     isLoaded = true;
-                }, 2000); // Имитация загрузки 2 секунды
+                }, 2000);
             }
         });
 
-        // Функция удаления
         window.delRep = async (docId) => {
             if(confirm("Удалить этот отчет навсегда?")) {
                 await deleteDoc(doc(db, "reports", docId));
             }
         }
 
-        // Снежинки
         function createSnowflake() { 
             const snow = document.createElement('div'); 
             snow.className = 'snowflake'; 
@@ -197,4 +186,5 @@
         setInterval(createSnowflake, 100);
     </script>
 </body>
+
 </html>
