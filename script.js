@@ -3,14 +3,32 @@ const LOGO_URL = 'https://i.imgur.com/I7sZuLM.jpeg';
 const CLIENT_ID = '1451284313109954650'; 
 const GUILD_ID = '1451234520006266933';
 const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
+const TECH_SUPPORT_ROLE_ID = '1451736104498888899';
 
 const RANK_ROLE_IDS = {
-    "1": "1451252022392131727",    
-    "2": "1451255428162916552",   
-    "3": "1451255653992628266",     
-    "4": "1451255819734876391",   
+    "1": "1451252022392131727",
+    "2": "1451255428162916552",
+    "3": "1451255653992628266",
+    "4": "1451255819734876391",
     "5": "1451256069782507580",
-    "6": "1451256164645081088"
+    "6": "1451256164645081088",
+    "7": "1451348361725739038",
+    "8": "1451348634359697418",
+    "9": "1451257290702196827",
+    "10": "1451258370127429804"
+};
+
+const RANK_NAMES = {
+    "1": "⦉ ◈ С О К О Л ◈ ⦊",
+    "2": "⦉ ◈ П О С Ы Л Ь Н Ы Й ◈ ⦊",
+    "3": "⦉ ◈ С И К А Р И О ◈ ⦊",
+    "4": "⦉ ◈ Б О Е Ц Г Б Р ◈ ⦊",
+    "5": "⦉ ◈ С Б О Р Щ И К ◈ ⦊",
+    "6": "⦉ ◈ О П Е Р А Т О Р ◈ ⦊",
+    "7": "⦉ ◈ Л Е Й Т Е Н А Н Т ◈ ⦊",
+    "8": "⦉ ◈ Л И Д Е Р Г Б Р ◈ ⦊",
+    "9": "⦉ ◈ К О Н С И Л Ь Е Р ◈ ⦊",
+    "10": "⦉ ◈ Д О Н ◈ ⦊"
 };
 
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
@@ -97,10 +115,12 @@ function checkGuildRoles(token, user) {
     .then(res => res.json())
     .then(member => {
         let isAdmin = false;
+        let isTech = false;
         let foundRank = 0;
 
         if (member.roles) {
             isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
+            isTech = member.roles.includes(TECH_SUPPORT_ROLE_ID);
             
             for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
                 if (member.roles.includes(roleId)) {
@@ -112,7 +132,7 @@ function checkGuildRoles(token, user) {
         }
         
         revealForm(user, isAdmin);
-        updateRankDisplay(user, foundRank, isAdmin);
+        updateRankDisplay(user, foundRank, isAdmin, isTech);
     })
     .catch(err => {
         console.error(err);
@@ -120,10 +140,10 @@ function checkGuildRoles(token, user) {
     });
 }
 
-function updateRankDisplay(user, rankVal, isAdmin) {
+function updateRankDisplay(user, rankVal, isAdmin, isTech) {
     const rankAvatar = document.getElementById('rankCardAvatar');
     const rankName = document.getElementById('rankCardName');
-    const adminBadge = document.getElementById('adminBadge');
+    const badgesContainer = document.getElementById('badgesContainer');
     const rankInput = document.getElementById('currentRank');
 
     const avatarUrl = user.avatar 
@@ -133,20 +153,30 @@ function updateRankDisplay(user, rankVal, isAdmin) {
     rankAvatar.src = avatarUrl;
 
     if (rankVal > 0) {
-        rankName.innerText = currentNames[rankVal];
+        rankName.innerText = RANK_NAMES[rankVal];
         rankInput.value = rankVal;
     } else {
-        rankName.innerText = "Нет ранга";
+        rankName.innerText = "Без ранга";
         rankInput.value = "0";
     }
 
+    badgesContainer.innerHTML = ''; 
+
     if (isAdmin) {
-        adminBadge.style.display = 'inline-block';
-    } else {
-        adminBadge.style.display = 'none';
+        const badge = document.createElement('span');
+        badge.className = 'role-badge admin-badge';
+        badge.innerText = 'АДМИНИСТРАТОР';
+        badgesContainer.appendChild(badge);
     }
 
-    updateNextRank();
+    if (isTech) {
+        const badge = document.createElement('span');
+        badge.className = 'role-badge tech-badge';
+        badge.innerText = '🛠️ ТЕХ. ПОДДЕРЖКА';
+        badgesContainer.appendChild(badge);
+    }
+
+    updateNextRank(rankVal);
 }
 
 function revealForm(user, isAdmin) {
@@ -168,35 +198,16 @@ function revealForm(user, isAdmin) {
     document.getElementById('userAvatar').src = avatar;
 }
 
-const nextRanks = { 
-    "1": "2 | Посыльный", 
-    "2": "3 | Сикарио", 
-    "3": "4 | Боец ГБР",
-    "4": "5 | Сборщик", 
-    "5": "6 | Оператор", 
-    "6": "7 | Лейтенант" 
-};
-
-const currentNames = { 
-    "1": "1 | Сокол", 
-    "2": "2 | Посыльный", 
-    "3": "3 | Сикарио", 
-    "4": "4 | Боец ГБР",
-    "5": "5 | Сборщик", 
-    "6": "6 | Оператор", 
-    "7": "7 | Лейтенант" 
-};
-
-function updateNextRank() {
-    const currentVal = document.getElementById('currentRank').value;
+function updateNextRank(currentVal) {
     const nextRankSelect = document.getElementById('newRank');
-    
     nextRankSelect.innerHTML = "";
 
-    if (nextRanks[currentVal]) {
+    const nextVal = parseInt(currentVal) + 1;
+
+    if (RANK_NAMES[nextVal] && nextVal <= 7) { 
         const option = document.createElement('option');
-        option.text = nextRanks[currentVal]; 
-        option.value = nextRanks[currentVal];
+        option.text = RANK_NAMES[nextVal]; 
+        option.value = RANK_NAMES[nextVal];
         option.selected = true;
         nextRankSelect.appendChild(option);
         
@@ -204,7 +215,7 @@ function updateNextRank() {
         nextRankSelect.style.opacity = "1";
     } else {
         const option = document.createElement('option');
-        option.text = "Максимальный ранг / Недоступно";
+        option.text = "Максимальный ранг / Спец. должность";
         nextRankSelect.appendChild(option);
     }
 }
@@ -225,7 +236,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     const reason = document.getElementById('promoteReason').value;
     
     const currentRankValue = document.getElementById('currentRank').value;
-    const currentRankName = currentNames[currentRankValue] || "Неизвестно";
+    const currentRankName = RANK_NAMES[currentRankValue] || "Неизвестно";
     
     const nextRankValue = document.getElementById('newRank').value;
     
