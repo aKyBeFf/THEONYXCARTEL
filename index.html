@@ -33,14 +33,14 @@
             <label>Имя и Фамилия (на русском)</label>
             <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
 
-            <div style="display: flex; gap: 15px; align-items: flex-end;">
-                <div style="flex: 1.5;">
+            <div class="row-inputs">
+                <div class="col-half">
                     <label>ID Паспорта</label>
                     <input type="text" id="passportId" placeholder="123456" maxlength="6" inputmode="numeric" required>
                 </div>
-                <div style="flex: 1;">
+                <div class="col-half">
                     <label>Возраст (OOC)</label>
-                    <div class="age-control">
+                    <div class="age-control-box">
                         <button type="button" class="age-btn" id="ageMinus">-</button>
                         <input type="number" id="age" value="16" min="1" max="99" readonly>
                         <button type="button" class="age-btn" id="agePlus">+</button>
