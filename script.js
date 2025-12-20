@@ -97,27 +97,22 @@ function checkGuildRoles(token, user) {
     .then(res => res.json())
     .then(member => {
         let isAdmin = false;
-        let currentRankValue = 0;
+        let foundRank = 0;
 
         if (member.roles) {
             isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
             
             for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
                 if (member.roles.includes(roleId)) {
-
-                    if (parseInt(rankVal) > currentRankValue) {
-                        currentRankValue = parseInt(rankVal);
+                    if (parseInt(rankVal) > foundRank) {
+                        foundRank = parseInt(rankVal);
                     }
                 }
             }
         }
         
         revealForm(user, isAdmin);
-        
-
-        if (currentRankValue > 0) {
-            filterRankDropdown(currentRankValue);
-        }
+        updateRankDisplay(user, foundRank, isAdmin);
     })
     .catch(err => {
         console.error(err);
@@ -125,21 +120,32 @@ function checkGuildRoles(token, user) {
     });
 }
 
+function updateRankDisplay(user, rankVal, isAdmin) {
+    const rankAvatar = document.getElementById('rankCardAvatar');
+    const rankName = document.getElementById('rankCardName');
+    const adminBadge = document.getElementById('adminBadge');
+    const rankInput = document.getElementById('currentRank');
 
-function filterRankDropdown(userLevel) {
-    const select = document.getElementById('currentRank');
-    const options = select.options;
+    const avatarUrl = user.avatar 
+        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
+        : `https://cdn.discordapp.com/embed/avatars/0.png`;
     
+    rankAvatar.src = avatarUrl;
 
-    for (let i = 0; i < options.length; i++) {
-        const optValue = parseInt(options[i].value);
-        if (!isNaN(optValue) && optValue < userLevel) {
-            options[i].style.display = 'none';
-        }
+    if (rankVal > 0) {
+        rankName.innerText = currentNames[rankVal];
+        rankInput.value = rankVal;
+    } else {
+        rankName.innerText = "Нет ранга";
+        rankInput.value = "0";
     }
 
+    if (isAdmin) {
+        adminBadge.style.display = 'inline-block';
+    } else {
+        adminBadge.style.display = 'none';
+    }
 
-    select.value = userLevel;
     updateNextRank();
 }
 
@@ -162,7 +168,7 @@ function revealForm(user, isAdmin) {
     document.getElementById('userAvatar').src = avatar;
 }
 
-const ranks = { 
+const nextRanks = { 
     "1": "2 | Посыльный", 
     "2": "3 | Сикарио", 
     "3": "4 | Боец ГБР",
@@ -170,6 +176,7 @@ const ranks = {
     "5": "6 | Оператор", 
     "6": "7 | Лейтенант" 
 };
+
 const currentNames = { 
     "1": "1 | Сокол", 
     "2": "2 | Посыльный", 
@@ -183,14 +190,22 @@ const currentNames = {
 function updateNextRank() {
     const currentVal = document.getElementById('currentRank').value;
     const nextRankSelect = document.getElementById('newRank');
+    
     nextRankSelect.innerHTML = "";
-    if (ranks[currentVal]) {
+
+    if (nextRanks[currentVal]) {
         const option = document.createElement('option');
-        option.value = ranks[currentVal]; option.text = ranks[currentVal]; option.selected = true;
+        option.text = nextRanks[currentVal]; 
+        option.value = nextRanks[currentVal];
+        option.selected = true;
         nextRankSelect.appendChild(option);
+        
+        nextRankSelect.style.color = "#fff";
+        nextRankSelect.style.opacity = "1";
     } else {
         const option = document.createElement('option');
-        option.text = "Макс. ранг / Спец"; nextRankSelect.appendChild(option);
+        option.text = "Максимальный ранг / Недоступно";
+        nextRankSelect.appendChild(option);
     }
 }
 
@@ -209,6 +224,11 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     const age = document.getElementById('age').value;
     const reason = document.getElementById('promoteReason').value;
     
+    const currentRankValue = document.getElementById('currentRank').value;
+    const currentRankName = currentNames[currentRankValue] || "Неизвестно";
+    
+    const nextRankValue = document.getElementById('newRank').value;
+    
     let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
 
     const data = {
@@ -223,7 +243,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
                 { name: "🏷 Позывной", value: `**${fullName}**`, inline: true },
                 { name: "🎂 Возраст", value: `${age} лет`, inline: true },
                 { name: "🆔 ID", value: `**${passportId}**`, inline: true },
-                { name: "📈 Повышение", value: `${currentNames[document.getElementById('currentRank').value]} ➡ ${document.getElementById('newRank').value}`, inline: false },
+                { name: "📈 Повышение", value: `${currentRankName} ➡ ${nextRankValue}`, inline: false },
                 { name: "📝 Почему должны повысить?", value: `>>> ${reason}`, inline: false }
             ],
             footer: { text: `Security ID: ${userData.id}` },
@@ -236,6 +256,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
             document.getElementById('rankForm').reset(); 
+            checkGuildRoles(localStorage.getItem('discord_token'), userData);
         } else { 
             showError("Ошибка отправки в Discord"); 
         } 
@@ -324,4 +345,3 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
-
