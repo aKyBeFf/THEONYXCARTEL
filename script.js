@@ -16,7 +16,32 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('mainLogo').src = LOGO_URL;
     document.getElementById('modalLogo').src = LOGO_URL;
     checkAuth();
+    setupInputs();
 });
+
+function setupInputs() {
+    const passportInput = document.getElementById('passportId');
+    passportInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/\D/g, '');
+        if (this.value.length > 6) {
+            this.value = this.value.slice(0, 6);
+        }
+    });
+
+    const ageInput = document.getElementById('age');
+    const btnMinus = document.getElementById('ageMinus');
+    const btnPlus = document.getElementById('agePlus');
+
+    btnMinus.addEventListener('click', () => {
+        let val = parseInt(ageInput.value) || 16;
+        if (val > 1) ageInput.value = val - 1;
+    });
+
+    btnPlus.addEventListener('click', () => {
+        let val = parseInt(ageInput.value) || 16;
+        if (val < 99) ageInput.value = val + 1;
+    });
+}
 
 function loginDiscord() {
     const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds.members.read`;
@@ -127,8 +152,23 @@ function fillPlayerData() {
     }
 }
 
-const ranks = { "1": "2 | Посыльный", "2": "3 | Сикарио", "3": "4 | Стрелок", "4": "5 | Сборщик", "5": "6 | Оператор", "6": "7 | Лейтенант" };
-const currentNames = { "1": "1 | Сокол", "2": "2 | Посыльный", "3": "3 | Сикарио", "4": "4 | Стрелок", "5": "5 | Сборщик", "6": "6 | Оператор", "7": "7 | Лейтенант" };
+const ranks = { 
+    "1": "2 | Посыльный", 
+    "2": "3 | Сикарио", 
+    "3": "4 | Боец ГБР",
+    "4": "5 | Сборщик", 
+    "5": "6 | Оператор", 
+    "6": "7 | Лейтенант" 
+};
+const currentNames = { 
+    "1": "1 | Сокол", 
+    "2": "2 | Посыльный", 
+    "3": "3 | Сикарио", 
+    "4": "4 | Боец ГБР",
+    "5": "5 | Сборщик", 
+    "6": "6 | Оператор", 
+    "7": "7 | Лейтенант" 
+};
 
 function updateNextRank() {
     const currentVal = document.getElementById('currentRank').value;
@@ -147,10 +187,15 @@ function updateNextRank() {
 document.getElementById('rankForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    const passportId = document.getElementById('passportId').value; 
+    if (passportId.length !== 6) {
+        showError("ID Паспорта должен содержать ровно 6 цифр!");
+        return;
+    }
+
     if (!WEBHOOK_URL) { alert("Ошибка: Вебхук не настроен!"); return; }
 
     const fullName = document.getElementById('fullname').value;
-    const passportId = document.getElementById('passportId').value; 
     const age = document.getElementById('age').value;
     const reason = document.getElementById('promoteReason').value;
     
@@ -259,5 +304,3 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
-
-
