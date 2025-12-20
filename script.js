@@ -32,11 +32,6 @@ function setupInputs() {
     formatPassportInput(document.getElementById('passportId'));
     formatPassportInput(document.getElementById('blId'));
 
-    const discordIdInput = document.getElementById('blDiscordId');
-    discordIdInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-    });
-
     const ageInput = document.getElementById('age');
     const btnMinus = document.getElementById('ageMinus');
     const btnPlus = document.getElementById('agePlus');
@@ -209,7 +204,6 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
     
     if (!WEBHOOK_BLACKLIST) { alert("Ошибка: Вебхук ЧС не настроен!"); return; }
 
-    const discordId = document.getElementById('blDiscordId').value;
     const name = document.getElementById('blName').value;
     const id = document.getElementById('blId').value;
     const reason = document.getElementById('blReason').value;
@@ -225,15 +219,14 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
 
     const data = {
         username: "Onyx Security",
-        content: `🚨 **ВНИМАНИЕ!** Пользователь <@${discordId}> занесен в Черный Список!`,
+        content: `🚨 **ВНИМАНИЕ!** Новый нарушитель в ЧС!`,
         embeds: [{
             title: "⛔ ЧЕРНЫЙ СПИСОК",
             color: 0x8B0000, 
             thumbnail: { url: avatarUrl },
             fields: [
                 { name: "👮 Администратор", value: `<@${userData.id}>`, inline: true },
-                { name: "👤 Нарушитель (Ping)", value: `<@${discordId}>`, inline: true },
-                { name: "👤 Имя", value: `**${name}**`, inline: true },
+                { name: "👤 Нарушитель", value: `**${name}**`, inline: true },
                 { name: "🆔 ID Нарушителя", value: `\`${id}\``, inline: true },
                 { name: "⚖️ Причина", value: reason, inline: false },
                 { name: "⏳ Срок наказания", value: duration, inline: false }
