@@ -284,15 +284,26 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
 function openModal(modalId) { 
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
-    overlay.style.display = 'flex'; 
-    setTimeout(() => { modal.classList.add('active'); }, 10); 
+    overlay.style.display = 'flex';
+    
+    setTimeout(() => { 
+        overlay.classList.add('active'); 
+        modal.classList.add('active');
+    }, 10); 
 }
+
 function closeModal(modalId) { 
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
-    modal.classList.remove('active'); 
-    setTimeout(() => { overlay.style.display = 'none'; }, 300); 
+    
+    overlay.classList.remove('active'); 
+    modal.classList.remove('active');
+
+    setTimeout(() => { 
+        overlay.style.display = 'none'; 
+    }, 400); 
 }
+
 function showError(msg) {
     document.getElementById('errorMsgText').innerText = msg;
     openModal('errorModal');
