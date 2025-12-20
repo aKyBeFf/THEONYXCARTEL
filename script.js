@@ -22,10 +22,17 @@ window.addEventListener('DOMContentLoaded', () => {
 function setupInputs() {
     const passportInput = document.getElementById('passportId');
     passportInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-        if (this.value.length > 6) {
-            this.value = this.value.slice(0, 6);
+        let value = this.value.replace(/\D/g, '');
+        
+        if (value.length > 6) {
+            value = value.slice(0, 6);
         }
+
+        if (value.length > 3) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+        }
+
+        this.value = value;
     });
 
     const ageInput = document.getElementById('age');
@@ -188,8 +195,8 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const passportId = document.getElementById('passportId').value; 
-    if (passportId.length !== 6) {
-        showError("ID Паспорта должен содержать ровно 6 цифр!");
+    if (passportId.length !== 7 || !passportId.includes('-')) {
+        showError("ID Паспорта должен быть в формате XXX-XXX (например, 543-621)");
         return;
     }
 
