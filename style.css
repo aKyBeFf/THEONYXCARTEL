@@ -153,19 +153,16 @@ textarea { resize: vertical; min-height: 100px; }
     .modal { padding: 30px 20px; }
 }
 
-/* === НОВЫЕ СТИЛИ ДЛЯ ПАСПОРТА И ВОЗРАСТА === */
 
 .row-container {
     display: flex;
     gap: 15px;
-    align-items: flex-end; /* Выравнивание по низу */
-}
+    align-items: flex-end;
 
 .input-half {
     flex: 1;
 }
 
-/* Красивая обертка для возраста */
 .age-wrapper {
     display: flex;
     align-items: center;
@@ -173,12 +170,11 @@ textarea { resize: vertical; min-height: 100px; }
     border: 1px solid #333;
     border-radius: 8px;
     margin-top: 8px;
-    height: 48px; /* Фиксированная высота как у других полей */
+    height: 48px;
     box-sizing: border-box;
     overflow: hidden;
 }
 
-/* Сами кнопки теперь часть блока */
 .age-btn {
     width: 45px;
     height: 100%;
@@ -203,10 +199,9 @@ textarea { resize: vertical; min-height: 100px; }
     background: #111;
 }
 
-/* Инпут внутри возраста */
 .age-wrapper input[type="number"] {
     flex-grow: 1;
-    border: none !important; /* Убираем рамки */
+    border: none !important;
     margin: 0 !important;
     padding: 0 !important;
     text-align: center;
@@ -214,13 +209,13 @@ textarea { resize: vertical; min-height: 100px; }
     height: 100%;
     color: #fff;
     font-size: 16px;
-    pointer-events: none; /* Запрещаем ввод с клавиатуры, только кнопки */
-    appearance: textfield; /* Убирает стрелки в Firefox */
+    pointer-events: none;
+    appearance: textfield;
 }
 
-/* Убираем стрелки в Chrome/Safari/Edge */
 .age-wrapper input[type="number"]::-webkit-outer-spin-button,
 .age-wrapper input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
