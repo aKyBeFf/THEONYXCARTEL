@@ -4,8 +4,6 @@ const CLIENT_ID = '1451284313109954650';
 const GUILD_ID = '1451234520006266933';
 const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
 
-// --- НАСТРОЙКИ ID РОЛЕЙ (ВСТАВЬ СЮДА СВОИ ID) ---
-// Если у игрока есть роль "Боец ГБР" (ранг 4), скрипт скроет ранги 1, 2 и 3.
 const RANK_ROLE_IDS = {
     "1": "1451252022392131727",    
     "2": "1451255428162916552",   
@@ -14,7 +12,6 @@ const RANK_ROLE_IDS = {
     "5": "1451256069782507580",
     "6": "1451256164645081088"
 };
-// ------------------------------------------------
 
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
 const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
@@ -102,14 +99,12 @@ function checkGuildRoles(token, user) {
         let isAdmin = false;
         let currentRankValue = 0;
 
-        // 1. Проверяем админку
         if (member.roles) {
             isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
             
-            // 2. Ищем самый высокий ранг пользователя по ролям
             for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
                 if (member.roles.includes(roleId)) {
-                    // Если нашли роль, и она выше, чем то, что мы уже нашли
+
                     if (parseInt(rankVal) > currentRankValue) {
                         currentRankValue = parseInt(rankVal);
                     }
@@ -119,7 +114,7 @@ function checkGuildRoles(token, user) {
         
         revealForm(user, isAdmin);
         
-        // 3. Если ранг найден, фильтруем список
+
         if (currentRankValue > 0) {
             filterRankDropdown(currentRankValue);
         }
@@ -130,22 +125,22 @@ function checkGuildRoles(token, user) {
     });
 }
 
-// ФУНКЦИЯ ФИЛЬТРАЦИИ РАНГОВ
+
 function filterRankDropdown(userLevel) {
     const select = document.getElementById('currentRank');
     const options = select.options;
     
-    // Скрываем все ранги, которые меньше текущего уровня
+
     for (let i = 0; i < options.length; i++) {
         const optValue = parseInt(options[i].value);
         if (!isNaN(optValue) && optValue < userLevel) {
-            options[i].style.display = 'none'; // Скрываем старые ранги
+            options[i].style.display = 'none';
         }
     }
 
-    // Автоматически выбираем текущий ранг
+
     select.value = userLevel;
-    updateNextRank(); // Обновляем поле "Доступное повышение"
+    updateNextRank();
 }
 
 function revealForm(user, isAdmin) {
@@ -329,3 +324,4 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
+
