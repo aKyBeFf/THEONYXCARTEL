@@ -7,8 +7,6 @@ const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '145134863
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
 const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
 
-const BOT_API_URL = 'https://onyx-cartel-system.discloud.app/api/players'; 
-
 const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
 let userData = null;
 
@@ -20,19 +18,23 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupInputs() {
-    const passportInput = document.getElementById('passportId');
-    passportInput.addEventListener('input', function(e) {
-        let value = this.value.replace(/\D/g, '');
-        
-        if (value.length > 6) {
-            value = value.slice(0, 6);
-        }
+    function formatPassportInput(inputElement) {
+        inputElement.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 6) value = value.slice(0, 6);
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+    
+            this.value = value;
+        });
+    }
 
-        if (value.length > 3) {
-            value = value.slice(0, 3) + '-' + value.slice(3);
-        }
+    formatPassportInput(document.getElementById('passportId'));
+    formatPassportInput(document.getElementById('blId'));
 
-        this.value = value;
+    const discordIdInput = document.getElementById('blDiscordId');
+    discordIdInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/\D/g, '');
     });
 
     const ageInput = document.getElementById('age');
@@ -97,7 +99,6 @@ function checkGuildRoles(token, user) {
             isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
         }
         revealForm(user, isAdmin);
-        if(isAdmin) loadBotPlayers();
     })
     .catch(err => {
         revealForm(user, false); 
@@ -121,42 +122,6 @@ function revealForm(user, isAdmin) {
         : `https://cdn.discordapp.com/embed/avatars/0.png`;
     
     document.getElementById('userAvatar').src = avatar;
-}
-
-function loadBotPlayers() {
-    if(!BOT_API_URL) return;
-
-    const select = document.getElementById('playerSelect');
-    select.innerHTML = '<option value="" selected disabled>Загрузка из базы...</option>';
-
-    fetch(BOT_API_URL)
-    .then(res => res.json())
-    .then(players => {
-        select.innerHTML = '<option value="" selected disabled>Выберите игрока...</option><option value="manual">-- Ввести вручную --</option>';
-        players.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = JSON.stringify({ name: p.name, id: p.id });
-            opt.text = `${p.name} (${p.id})`;
-            select.appendChild(opt);
-        });
-    })
-    .catch(err => {
-        select.innerHTML = '<option value="manual" selected>Ошибка связи (Ввести вручную)</option>';
-    });
-}
-
-function fillPlayerData() {
-    const select = document.getElementById('playerSelect');
-    const val = select.value;
-
-    if (val === 'manual') {
-        document.getElementById('blName').value = "";
-        document.getElementById('blId').value = "";
-    } else if (val) {
-        const player = JSON.parse(val);
-        document.getElementById('blName').value = player.name;
-        document.getElementById('blId').value = player.id;
-    }
 }
 
 const ranks = { 
@@ -244,23 +209,31 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
     
     if (!WEBHOOK_BLACKLIST) { alert("Ошибка: Вебхук ЧС не настроен!"); return; }
 
+    const discordId = document.getElementById('blDiscordId').value;
     const name = document.getElementById('blName').value;
     const id = document.getElementById('blId').value;
     const reason = document.getElementById('blReason').value;
     const duration = document.getElementById('blDuration').value;
+    
+    if (id.length !== 7 || !id.includes('-')) {
+        showError("ID Игрока должен быть в формате XXX-XXX");
+        return;
+    }
 
     closeModal('blacklistModal');
     let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
 
     const data = {
         username: "Onyx Security",
+        content: `🚨 **ВНИМАНИЕ!** Пользователь <@${discordId}> занесен в Черный Список!`,
         embeds: [{
             title: "⛔ ЧЕРНЫЙ СПИСОК",
             color: 0x8B0000, 
             thumbnail: { url: avatarUrl },
             fields: [
                 { name: "👮 Администратор", value: `<@${userData.id}>`, inline: true },
-                { name: "👤 Нарушитель", value: `**${name}**`, inline: true },
+                { name: "👤 Нарушитель (Ping)", value: `<@${discordId}>`, inline: true },
+                { name: "👤 Имя", value: `**${name}**`, inline: true },
                 { name: "🆔 ID Нарушителя", value: `\`${id}\``, inline: true },
                 { name: "⚖️ Причина", value: reason, inline: false },
                 { name: "⏳ Срок наказания", value: duration, inline: false }
