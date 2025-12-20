@@ -30,16 +30,16 @@
 
     <div id="formContainer">
         <form id="rankForm">
-            <label>Имя и Фамилия (которое в игре)</label>
+            <label>Имя и Фамилия (на русском)</label>
             <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
 
             <div class="row-container">
                 <div class="input-half">
-                    <label>ID</label>
+                    <label>ID Паспорта</label>
                     <input type="text" id="passportId" placeholder="543-621" maxlength="7" inputmode="numeric" required>
                 </div>
                 <div class="input-half">
-                    <label>Возраст</label>
+                    <label>Возраст (OOC)</label>
                     <div class="age-wrapper">
                         <div class="age-btn" id="ageMinus">-</div>
                         <input type="number" id="age" value="16" min="1" max="99" readonly>
@@ -99,14 +99,14 @@
         </div>
         
         <form id="blacklistForm">
-            <label>Выберите игрока</label>
-            <select id="playerSelect" onchange="fillPlayerData()">
-                <option value="" selected disabled>Загрузка списка...</option>
-                <option value="manual">-- Ввести вручную --</option>
-            </select>
+            <label>Discord ID Нарушителя</label>
+            <input type="text" id="blDiscordId" placeholder="Напр: 34582309485..." inputmode="numeric" required>
 
-            <input type="text" id="blName" placeholder="Имя нарушителя" required style="margin-top: 10px;">
-            <input type="text" id="blId" placeholder="Статический ID" required>
+            <label>Имя Нарушителя</label>
+            <input type="text" id="blName" placeholder="Имя Фамилия" required>
+            
+            <label>ID (542-768)</label>
+            <input type="text" id="blId" placeholder="XXX-XXX" maxlength="7" inputmode="numeric" required>
             
             <label>Детали нарушения</label>
             <input type="text" id="blReason" placeholder="Причина (напр. Слив склада)" required>
