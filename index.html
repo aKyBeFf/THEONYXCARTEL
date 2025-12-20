@@ -33,14 +33,18 @@
             <label>Имя и Фамилия (на русском)</label>
             <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
 
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
+            <div style="display: flex; gap: 15px; align-items: flex-end;">
+                <div style="flex: 1.5;">
                     <label>ID Паспорта</label>
-                    <input type="text" id="passportId" placeholder="123-123" required>
+                    <input type="text" id="passportId" placeholder="123456" maxlength="6" inputmode="numeric" required>
                 </div>
                 <div style="flex: 1;">
                     <label>Возраст (OOC)</label>
-                    <input type="number" id="age" placeholder="16" required>
+                    <div class="age-control">
+                        <button type="button" class="age-btn" id="ageMinus">-</button>
+                        <input type="number" id="age" value="16" min="1" max="99" readonly>
+                        <button type="button" class="age-btn" id="agePlus">+</button>
+                    </div>
                 </div>
             </div>
 
@@ -50,7 +54,7 @@
                 <option value="1">1 | Сокол</option>
                 <option value="2">2 | Посыльный</option>
                 <option value="3">3 | Сикарио</option>
-                <option value="4">4 | Стрелок</option>
+                <option value="4">4 | Боец ГБР</option>
                 <option value="5">5 | Сборщик</option>
                 <option value="6">6 | Оператор</option>
             </select>
