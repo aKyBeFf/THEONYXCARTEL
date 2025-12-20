@@ -16,7 +16,7 @@
         <div id="profileName" class="profile-name">Загрузка...</div>
         <div id="profileRank" class="profile-rank"></div>
         <div id="profileBadges" class="profile-badges"></div>
-        <button id="techDebugBtn" class="tech-btn" style="display: none;">⚙️ SYS.DEBUG</button>
+        <button id="techGameBtn" class="tech-btn" style="display: none;">🎮 PLAY</button>
     </div>
     <img src="" id="profileAvatar" class="profile-avatar" alt="">
 </div>
@@ -35,7 +35,7 @@
 
     <div id="formContainer">
         <form id="rankForm">
-            <label>Имя и Фамилия (которое в игре)</label>
+            <label>Имя и Фамилия (в игре)</label>
             <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
 
             <div class="row-container">
@@ -108,6 +108,14 @@
             <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 20px;">ЗАНЕСТИ В ЧС</button>
         </form>
         <button class="modal-btn" onclick="closeModal('blacklistModal')" style="background: transparent; color: #666; margin-top: 5px; border: 1px solid #333; padding: 10px;">Отмена</button>
+    </div>
+
+    <div class="modal" id="gameModal">
+        <div class="modal-title" style="color: #5865F2;">ONYX SNAKE</div>
+        <div id="gameScore" style="margin-bottom: 10px; font-weight: bold;">Счет: 0</div>
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+        <div style="font-size: 10px; color: #666; margin-top: 10px;">Используйте стрелки для управления</div>
+        <button class="modal-btn" onclick="closeGameModal()">Закрыть</button>
     </div>
 </div>
 
