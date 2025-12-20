@@ -49,15 +49,15 @@
             </div>
 
             <label>Текущий ранг</label>
-            <select id="currentRank" onchange="updateNextRank()" required>
-                <option value="" disabled selected>Выберите ранг...</option>
-                <option value="1">1 | Сокол</option>
-                <option value="2">2 | Посыльный</option>
-                <option value="3">3 | Сикарио</option>
-                <option value="4">4 | Боец ГБР</option>
-                <option value="5">5 | Сборщик</option>
-                <option value="6">6 | Оператор</option>
-            </select>
+            <div class="rank-card">
+                <img src="" id="rankCardAvatar" class="rank-card-avatar" alt="">
+                <div class="rank-card-info">
+                    <div id="rankCardName" class="rank-card-title">Загрузка...</div>
+                    <div id="adminBadge" class="admin-badge" style="display: none;">АДМИНИСТРАТОР</div>
+                </div>
+            </div>
+            
+            <input type="hidden" id="currentRank" value="">
 
             <label>Доступное повышение</label>
             <select id="newRank" disabled>
@@ -118,4 +118,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
