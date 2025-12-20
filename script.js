@@ -4,6 +4,18 @@ const CLIENT_ID = '1451284313109954650';
 const GUILD_ID = '1451234520006266933';
 const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
 
+// --- НАСТРОЙКИ ID РОЛЕЙ (ВСТАВЬ СЮДА СВОИ ID) ---
+// Если у игрока есть роль "Боец ГБР" (ранг 4), скрипт скроет ранги 1, 2 и 3.
+const RANK_ROLE_IDS = {
+    "1": "1451252022392131727",    
+    "2": "1451255428162916552",   
+    "3": "1451255653992628266",     
+    "4": "1451255819734876391",   
+    "5": "1451256069782507580",
+    "6": "1451256164645081088"
+};
+// ------------------------------------------------
+
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
 const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
 
@@ -21,10 +33,8 @@ function setupInputs() {
     function formatPassportInput(inputElement) {
         inputElement.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
-            
             if (value.length > 6) value = value.slice(0, 6);
             if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
-    
             this.value = value;
         });
     }
@@ -90,14 +100,52 @@ function checkGuildRoles(token, user) {
     .then(res => res.json())
     .then(member => {
         let isAdmin = false;
+        let currentRankValue = 0;
+
+        // 1. Проверяем админку
         if (member.roles) {
             isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
+            
+            // 2. Ищем самый высокий ранг пользователя по ролям
+            for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
+                if (member.roles.includes(roleId)) {
+                    // Если нашли роль, и она выше, чем то, что мы уже нашли
+                    if (parseInt(rankVal) > currentRankValue) {
+                        currentRankValue = parseInt(rankVal);
+                    }
+                }
+            }
         }
+        
         revealForm(user, isAdmin);
+        
+        // 3. Если ранг найден, фильтруем список
+        if (currentRankValue > 0) {
+            filterRankDropdown(currentRankValue);
+        }
     })
     .catch(err => {
+        console.error(err);
         revealForm(user, false); 
     });
+}
+
+// ФУНКЦИЯ ФИЛЬТРАЦИИ РАНГОВ
+function filterRankDropdown(userLevel) {
+    const select = document.getElementById('currentRank');
+    const options = select.options;
+    
+    // Скрываем все ранги, которые меньше текущего уровня
+    for (let i = 0; i < options.length; i++) {
+        const optValue = parseInt(options[i].value);
+        if (!isNaN(optValue) && optValue < userLevel) {
+            options[i].style.display = 'none'; // Скрываем старые ранги
+        }
+    }
+
+    // Автоматически выбираем текущий ранг
+    select.value = userLevel;
+    updateNextRank(); // Обновляем поле "Доступное повышение"
 }
 
 function revealForm(user, isAdmin) {
@@ -250,26 +298,19 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
 function openModal(modalId) { 
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
-    overlay.style.display = 'flex';
-    
+    overlay.style.display = 'flex'; 
     setTimeout(() => { 
         overlay.classList.add('active'); 
         modal.classList.add('active');
     }, 10); 
 }
-
 function closeModal(modalId) { 
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
-    
     overlay.classList.remove('active'); 
     modal.classList.remove('active');
-
-    setTimeout(() => { 
-        overlay.style.display = 'none'; 
-    }, 400); 
+    setTimeout(() => { overlay.style.display = 'none'; }, 400); 
 }
-
 function showError(msg) {
     document.getElementById('errorMsgText').innerText = msg;
     openModal('errorModal');
