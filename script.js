@@ -70,6 +70,10 @@ function setupInputs() {
         let val = parseInt(ageInput.value) || 16;
         if (val < 99) ageInput.value = val + 1;
     });
+
+    document.getElementById('techDebugBtn').addEventListener('click', () => {
+        showError("✅ DIAGNOSTIC: ONYX SYSTEM ONLINE. PING: 12ms");
+    });
 }
 
 function loginDiscord() {
@@ -141,39 +145,46 @@ function checkGuildRoles(token, user) {
 }
 
 function updateRankDisplay(user, rankVal, isAdmin, isTech) {
-    const rankAvatar = document.getElementById('rankCardAvatar');
-    const rankName = document.getElementById('rankCardName');
-    const badgesContainer = document.getElementById('badgesContainer');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileName = document.getElementById('profileName');
+    const profileRank = document.getElementById('profileRank');
+    const profileBadges = document.getElementById('profileBadges');
+    const techBtn = document.getElementById('techDebugBtn');
+    
     const rankInput = document.getElementById('currentRank');
 
     const avatarUrl = user.avatar 
         ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
         : `https://cdn.discordapp.com/embed/avatars/0.png`;
     
-    rankAvatar.src = avatarUrl;
+    profileAvatar.src = avatarUrl;
+    profileName.innerText = user.username;
 
     if (rankVal > 0) {
-        rankName.innerText = RANK_NAMES[rankVal];
+        profileRank.innerText = RANK_NAMES[rankVal];
         rankInput.value = rankVal;
     } else {
-        rankName.innerText = "Без ранга";
+        profileRank.innerText = "БЕЗ РАНГА";
         rankInput.value = "0";
     }
 
-    badgesContainer.innerHTML = ''; 
+    profileBadges.innerHTML = ''; 
 
     if (isAdmin) {
         const badge = document.createElement('span');
         badge.className = 'role-badge admin-badge';
-        badge.innerText = 'АДМИНИСТРАТОР';
-        badgesContainer.appendChild(badge);
+        badge.innerText = 'АДМИН';
+        profileBadges.appendChild(badge);
     }
 
     if (isTech) {
         const badge = document.createElement('span');
         badge.className = 'role-badge tech-badge';
-        badge.innerText = '🛠️ ТЕХ. ПОДДЕРЖКА';
-        badgesContainer.appendChild(badge);
+        badge.innerText = 'TECH';
+        profileBadges.appendChild(badge);
+        techBtn.style.display = 'block';
+    } else {
+        techBtn.style.display = 'none';
     }
 
     updateNextRank(rankVal);
@@ -189,13 +200,6 @@ function revealForm(user, isAdmin) {
 
     const profile = document.getElementById('topProfile');
     profile.style.display = 'flex';
-    document.getElementById('userName').innerText = user.username;
-    
-    const avatar = user.avatar 
-        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` 
-        : `https://cdn.discordapp.com/embed/avatars/0.png`;
-    
-    document.getElementById('userAvatar').src = avatar;
 }
 
 function updateNextRank(currentVal) {
