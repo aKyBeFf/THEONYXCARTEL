@@ -87,25 +87,32 @@
         <button class="modal-btn btn-error" onclick="closeModal('errorModal')">Понял</button>
     </div>
 
-    <div class="modal" id="blacklistModal" style="max-width: 400px;">
-        <div class="modal-title error-text" style="color: #ff4d4d; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px;">
+    <div class="modal blacklist-modal" id="blacklistModal">
+        <div class="modal-title error-text" style="color: #ff4d4d; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; letter-spacing: 3px;">
             ЧЕРНЫЙ СПИСОК
         </div>
         
         <form id="blacklistForm">
-            <label>Имя Нарушителя</label>
-            <input type="text" id="blName" placeholder="Имя Фамилия" required>
+            <div class="row-container">
+                <div class="input-half">
+                    <label>Имя Нарушителя</label>
+                    <input type="text" id="blName" placeholder="Имя Фамилия" required>
+                </div>
+                <div class="input-half">
+                    <label>ID</label>
+                    <input type="text" id="blId" placeholder="542-768" maxlength="7" inputmode="numeric" required>
+                </div>
+            </div>
             
-            <label>ID</label>
-            <input type="text" id="blId" placeholder="542-768" maxlength="7" inputmode="numeric" required>
+            <label>Причина</label>
+            <input type="text" id="blReason" placeholder="Напр. Слив склада" required>
             
-            <label>Детали нарушения</label>
-            <input type="text" id="blReason" placeholder="Причина (напр. Слив склада)" required>
-            <input type="text" id="blDuration" placeholder="Срок наказания (напр. 30 дней)" required>
+            <label>Срок наказания</label>
+            <input type="text" id="blDuration" placeholder="Напр. 30 дней" required>
             
-            <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 20px;">ЗАНЕСТИ В ЧС</button>
+            <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 25px; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);">ЗАНЕСТИ В ЧС</button>
         </form>
-        <button class="modal-btn" onclick="closeModal('blacklistModal')" style="background: transparent; color: #666; margin-top: 5px; border: 1px solid #333; padding: 10px;">Отмена</button>
+        <button class="modal-btn-ghost" onclick="closeModal('blacklistModal')">Отмена</button>
     </div>
 
     <div class="modal" id="gameModal">
