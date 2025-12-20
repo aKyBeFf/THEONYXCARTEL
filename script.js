@@ -151,7 +151,6 @@ function updateRankDisplay(user, rankVal, isAdmin, isTech) {
     const profileRank = document.getElementById('profileRank');
     const profileBadges = document.getElementById('profileBadges');
     const techBtn = document.getElementById('techGameBtn');
-    
     const rankInput = document.getElementById('currentRank');
 
     const avatarUrl = user.avatar 
@@ -204,24 +203,19 @@ function revealForm(user, isAdmin) {
 }
 
 function updateNextRank(currentVal) {
-    const nextRankSelect = document.getElementById('newRank');
-    nextRankSelect.innerHTML = "";
-
+    const nextRankInput = document.getElementById('newRank');
     const nextVal = parseInt(currentVal) + 1;
 
-    if (RANK_NAMES[nextVal] && nextVal <= 7) { 
-        const option = document.createElement('option');
-        option.text = RANK_NAMES[nextVal]; 
-        option.value = RANK_NAMES[nextVal];
-        option.selected = true;
-        nextRankSelect.appendChild(option);
-        
-        nextRankSelect.style.color = "#fff";
-        nextRankSelect.style.opacity = "1";
+    // Логика: Ранг 7 (Лейтенант) - последний, кто может повыситься до 8.
+    // Если текущий ранг 7, повышение до 8 возможно (теоретически), но если скрипт должен отсекать,
+    // то для высшей администрации (8,9,10) мы пишем макс ранг.
+    
+    if (currentVal >= 7) {
+        nextRankInput.value = "Максимальный ранг / Спец. должность";
+    } else if (RANK_NAMES[nextVal]) {
+        nextRankInput.value = RANK_NAMES[nextVal];
     } else {
-        const option = document.createElement('option');
-        option.text = "Максимальный ранг / Спец. должность";
-        nextRankSelect.appendChild(option);
+        nextRankInput.value = "Повышение недоступно";
     }
 }
 
@@ -242,8 +236,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     
     const currentRankValue = document.getElementById('currentRank').value;
     const currentRankName = RANK_NAMES[currentRankValue] || "Неизвестно";
-    
-    const nextRankValue = document.getElementById('newRank').value;
+    const nextRankName = document.getElementById('newRank').value;
     
     let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
 
@@ -259,7 +252,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
                 { name: "🏷 Позывной", value: `**${fullName}**`, inline: true },
                 { name: "🎂 Возраст", value: `${age} лет`, inline: true },
                 { name: "🆔 ID", value: `**${passportId}**`, inline: true },
-                { name: "📈 Повышение", value: `${currentRankName} ➡ ${nextRankValue}`, inline: false },
+                { name: "📈 Повышение", value: `${currentRankName} ➡ ${nextRankName}`, inline: false },
                 { name: "📝 Почему должны повысить?", value: `>>> ${reason}`, inline: false }
             ],
             footer: { text: `Security ID: ${userData.id}` },
