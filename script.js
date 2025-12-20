@@ -205,10 +205,6 @@ function revealForm(user, isAdmin) {
 function updateNextRank(currentVal) {
     const nextRankInput = document.getElementById('newRank');
     const nextVal = parseInt(currentVal) + 1;
-
-    // Логика: Ранг 7 (Лейтенант) - последний, кто может повыситься до 8.
-    // Если текущий ранг 7, повышение до 8 возможно (теоретически), но если скрипт должен отсекать,
-    // то для высшей администрации (8,9,10) мы пишем макс ранг.
     
     if (currentVal >= 7) {
         nextRankInput.value = "Максимальный ранг / Спец. должность";
@@ -440,3 +436,4 @@ function collision(head, array) {
     }
     return false;
 }
+
