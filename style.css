@@ -154,10 +154,12 @@ textarea { resize: vertical; min-height: 100px; }
 }
 
 
+
 .row-container {
     display: flex;
     gap: 15px;
     align-items: flex-end;
+}
 
 .input-half {
     flex: 1;
@@ -201,6 +203,7 @@ textarea { resize: vertical; min-height: 100px; }
 
 .age-wrapper input[type="number"] {
     flex-grow: 1;
+    min-width: 0;
     border: none !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -210,6 +213,7 @@ textarea { resize: vertical; min-height: 100px; }
     color: #fff;
     font-size: 16px;
     pointer-events: none;
+    -moz-appearance: textfield;
     appearance: textfield;
 }
 
@@ -218,4 +222,3 @@ textarea { resize: vertical; min-height: 100px; }
     -webkit-appearance: none;
     margin: 0;
 }
-
