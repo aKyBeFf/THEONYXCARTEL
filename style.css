@@ -97,7 +97,7 @@ body {
     border: 1px solid #5865F2;
     color: #5865F2;
     font-size: 9px;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
@@ -318,4 +318,11 @@ textarea { resize: vertical; min-height: 100px; }
 .age-wrapper input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+#gameCanvas {
+    background-color: #000;
+    border: 2px solid #333;
+    display: block;
+    margin: 0 auto;
 }
