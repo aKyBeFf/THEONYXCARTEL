@@ -153,8 +153,6 @@ textarea { resize: vertical; min-height: 100px; }
     .modal { padding: 30px 20px; }
 }
 
-
-
 .row-container {
     display: flex;
     gap: 15px;
