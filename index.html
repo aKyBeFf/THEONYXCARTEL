@@ -12,8 +12,13 @@
 <div id="snow-container"></div>
 
 <div id="topProfile" class="profile-badge">
-    <span id="userName" class="profile-name">Загрузка...</span>
-    <img src="" id="userAvatar" class="profile-avatar">
+    <div class="profile-info">
+        <div id="profileName" class="profile-name">Загрузка...</div>
+        <div id="profileRank" class="profile-rank"></div>
+        <div id="profileBadges" class="profile-badges"></div>
+        <button id="techDebugBtn" class="tech-btn" style="display: none;">⚙️ SYS.DEBUG</button>
+    </div>
+    <img src="" id="profileAvatar" class="profile-avatar" alt="">
 </div>
 
 <div class="form-card">
@@ -45,15 +50,6 @@
                         <input type="number" id="age" value="16" min="1" max="99" readonly>
                         <div class="age-btn" id="agePlus">+</div>
                     </div>
-                </div>
-            </div>
-
-            <label>Текущий ранг</label>
-            <div class="rank-card">
-                <img src="" id="rankCardAvatar" class="rank-card-avatar" alt="">
-                <div class="rank-card-info">
-                    <div id="rankCardName" class="rank-card-title">Загрузка...</div>
-                    <div id="badgesContainer" class="badges-container"></div>
                 </div>
             </div>
             
