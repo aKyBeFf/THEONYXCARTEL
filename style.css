@@ -153,43 +153,60 @@ textarea { resize: vertical; min-height: 100px; }
     .modal { padding: 30px 20px; }
 }
 
-.age-control {
+
+.row-inputs {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+.col-half {
+    flex: 1;
+}
+
+
+.age-control-box {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background: #131313;
     border: 1px solid #333;
     border-radius: 8px;
-    overflow: hidden;
     margin-top: 8px;
+    height: 48px;
+    overflow: hidden;
 }
 
 .age-btn {
-    background: #222;
+    background: #1a1a1a;
     color: #fff;
     border: none;
-    width: 40px;
-    height: 50px;
-    font-size: 18px;
+    width: 45px;
+    height: 100%;
+    font-size: 20px;
     cursor: pointer;
     transition: 0.2s;
     font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-
 .age-btn:hover {
     background: #333;
     color: #5865F2;
 }
-
 .age-btn:active {
     background: #111;
 }
 
-.age-control input {
-    margin-top: 0;
+.age-control-box input {
     border: none;
-    text-align: center;
     background: transparent;
-    height: 50px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    height: 100%;
+    flex-grow: 1;
+    font-size: 16px;
     pointer-events: none;
 }
 
