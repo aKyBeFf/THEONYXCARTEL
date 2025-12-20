@@ -35,7 +35,7 @@
 
     <div id="formContainer">
         <form id="rankForm">
-            <label>Имя и Фамилия (в игре)</label>
+            <label>Имя Фамилия (В игре)</label>
             <input type="text" id="fullname" placeholder="Напр: Андрей Конченган" required>
 
             <div class="row-container">
@@ -56,9 +56,7 @@
             <input type="hidden" id="currentRank" value="">
 
             <label>Доступное повышение</label>
-            <select id="newRank" disabled>
-                <option value="">Ожидание...</option>
-            </select>
+            <input type="text" id="newRank" class="locked-input" readonly placeholder="Ожидание..." tabindex="-1">
 
             <label>Почему вас должны повысить?</label>
             <textarea id="promoteReason" rows="5" placeholder="Опишите проделанную работу, ваши достижения и почему вы достойны нового ранга..." required></textarea>
@@ -98,7 +96,7 @@
             <label>Имя Нарушителя</label>
             <input type="text" id="blName" placeholder="Имя Фамилия" required>
             
-            <label>ID (542-768)</label>
+            <label>ID</label>
             <input type="text" id="blId" placeholder="542-768" maxlength="7" inputmode="numeric" required>
             
             <label>Детали нарушения</label>
