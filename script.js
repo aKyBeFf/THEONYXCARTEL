@@ -71,8 +71,9 @@ function setupInputs() {
         if (val < 99) ageInput.value = val + 1;
     });
 
-    document.getElementById('techDebugBtn').addEventListener('click', () => {
-        showError("✅ DIAGNOSTIC: ONYX SYSTEM ONLINE. PING: 12ms");
+    document.getElementById('techGameBtn').addEventListener('click', () => {
+        openModal('gameModal');
+        startGame();
     });
 }
 
@@ -149,7 +150,7 @@ function updateRankDisplay(user, rankVal, isAdmin, isTech) {
     const profileName = document.getElementById('profileName');
     const profileRank = document.getElementById('profileRank');
     const profileBadges = document.getElementById('profileBadges');
-    const techBtn = document.getElementById('techDebugBtn');
+    const techBtn = document.getElementById('techGameBtn');
     
     const rankInput = document.getElementById('currentRank');
 
@@ -360,3 +361,89 @@ function createSnowflake() {
 }
 
 setInterval(createSnowflake, 100);
+
+let gameInterval;
+let snake = [];
+let food = {};
+let direction = 'right';
+let score = 0;
+const box = 15;
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+function startGame() {
+    snake = [{x: 9 * box, y: 10 * box}];
+    food = {
+        x: Math.floor(Math.random() * 19 + 1) * box,
+        y: Math.floor(Math.random() * 19 + 1) * box
+    };
+    score = 0;
+    direction = 'right';
+    document.getElementById('gameScore').innerText = 'Счет: 0';
+    if(gameInterval) clearInterval(gameInterval);
+    gameInterval = setInterval(drawGame, 100);
+}
+
+function closeGameModal() {
+    closeModal('gameModal');
+    clearInterval(gameInterval);
+}
+
+document.addEventListener('keydown', directionControl);
+
+function directionControl(event) {
+    if(event.keyCode == 37 && direction != 'right') direction = 'left';
+    else if(event.keyCode == 38 && direction != 'down') direction = 'up';
+    else if(event.keyCode == 39 && direction != 'left') direction = 'right';
+    else if(event.keyCode == 40 && direction != 'up') direction = 'down';
+}
+
+function drawGame() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    for(let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = (i == 0) ? '#5865F2' : '#fff';
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+    }
+
+    ctx.fillStyle = '#ff4d4d';
+    ctx.fillRect(food.x, food.y, box, box);
+
+    let snakeX = snake[0].x;
+    let snakeY = snake[0].y;
+
+    if(direction == 'left') snakeX -= box;
+    if(direction == 'up') snakeY -= box;
+    if(direction == 'right') snakeX += box;
+    if(direction == 'down') snakeY += box;
+
+    if(snakeX == food.x && snakeY == food.y) {
+        score++;
+        document.getElementById('gameScore').innerText = 'Счет: ' + score;
+        food = {
+            x: Math.floor(Math.random() * 19 + 1) * box,
+            y: Math.floor(Math.random() * 19 + 1) * box
+        };
+    } else {
+        snake.pop();
+    }
+
+    let newHead = { x: snakeX, y: snakeY };
+
+    if(snakeX < 0 || snakeX > canvas.width - box || snakeY < 0 || snakeY > canvas.height - box || collision(newHead, snake)) {
+        clearInterval(gameInterval);
+        alert('GAME OVER. Счет: ' + score);
+    }
+
+    snake.unshift(newHead);
+}
+
+function collision(head, array) {
+    for(let i = 0; i < array.length; i++) {
+        if(head.x == array[i].x && head.y == array[i].y) {
+            return true;
+        }
+    }
+    return false;
+}
