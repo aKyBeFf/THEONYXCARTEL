@@ -246,7 +246,6 @@ textarea { resize: vertical; min-height: 100px; }
     margin: 0;
 }
 
-/* КАРТОЧКА РАНГА */
 .rank-card {
     background: #131313;
     border: 1px solid #333;
@@ -274,21 +273,36 @@ textarea { resize: vertical; min-height: 100px; }
 .rank-card-title {
     color: #fff;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.badges-container {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.role-badge {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .admin-badge {
     color: #ff4d4d;
-    font-size: 10px;
-    font-weight: 800;
     border: 1px solid #ff4d4d;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-top: 6px;
-    display: inline-block;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     background: rgba(255, 77, 77, 0.1);
+}
+
+.tech-badge {
+    color: #5865F2;
+    border: 1px solid #5865F2;
+    background: rgba(88, 101, 242, 0.1);
 }
