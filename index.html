@@ -16,7 +16,7 @@
         <div id="profileName" class="profile-name">Загрузка...</div>
         <div id="profileRank" class="profile-rank"></div>
         <div id="profileBadges" class="profile-badges"></div>
-        <button id="techGameBtn" class="tech-btn" style="display: none;">🎮 PLAY</button>
+        <button id="techDebugBtn" class="tech-btn" style="display: none;">🛠️ DEBUG</button>
     </div>
     <img src="" id="profileAvatar" class="profile-avatar" alt="">
 </div>
@@ -104,23 +104,23 @@
                 </div>
             </div>
             
-            <label>Причина</label>
-            <input type="text" id="blReason" placeholder="Напр. Слив склада" required>
+            <label>Детали нарушения</label>
+            <input type="text" id="blReason" placeholder="Причина (напр. Слив склада)" required>
             
             <label>Срок наказания</label>
-            <input type="text" id="blDuration" placeholder="Напр. 30 дней" required>
+            <input type="text" id="blDuration" placeholder="Срок наказания (напр. 30 дней)" required>
             
             <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 25px; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);">ЗАНЕСТИ В ЧС</button>
         </form>
         <button class="modal-btn-ghost" onclick="closeModal('blacklistModal')">Отмена</button>
     </div>
 
-    <div class="modal" id="gameModal">
-        <div class="modal-title" style="color: #5865F2;">ONYX SNAKE</div>
-        <div id="gameScore" style="margin-bottom: 10px; font-weight: bold;">Счет: 0</div>
-        <canvas id="gameCanvas" width="300" height="300"></canvas>
-        <div style="font-size: 10px; color: #666; margin-top: 10px;">Используйте стрелки для управления</div>
-        <button class="modal-btn" onclick="closeGameModal()">Закрыть</button>
+    <div class="modal" id="debugModal" style="max-width: 500px; text-align: left;">
+        <div class="modal-title" style="color: #5865F2; text-align: center;">SYSTEM INSPECTOR</div>
+        <div class="debug-console" id="debugConsole">
+            Загрузка данных...
+        </div>
+        <button class="modal-btn" onclick="closeModal('debugModal')">Закрыть</button>
     </div>
 </div>
 
