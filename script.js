@@ -218,8 +218,7 @@ function updateNextRank(currentVal) {
     const nextRankInput = document.getElementById('newRank');
     const nextVal = parseInt(currentVal) + 1;
 
-    
-    if (currentVal >= 7) {
+    if (currentVal >= 5) {
         nextRankInput.value = "Максимальный ранг / Спец. должность";
     } else if (RANK_NAMES[nextVal]) {
         nextRankInput.value = RANK_NAMES[nextVal];
