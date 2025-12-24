@@ -120,9 +120,9 @@ body {
     backdrop-filter: blur(10px); margin: 30px 0; 
 }
 
-/* НАВИГАЦИЯ СВЕРХУ */
+
 .top-nav {
-    display: none; /* Скрыто до входа */
+    display: none;
     justify-content: center;
     gap: 15px;
     margin-bottom: 20px;
@@ -196,22 +196,22 @@ body {
 .btn-discord-big:hover { background: #4752C4; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5); }
 .btn-discord-big:active { transform: scale(0.96); transition: all 0.1s ease-out; }
 
-#formContainer { display: none; overflow: hidden; animation: smoothReveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+#formContainer, #sicariosContainer { display: none; overflow: hidden; animation: smoothReveal 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 @keyframes smoothReveal { 0% { opacity: 0; max-height: 0; transform: translateY(20px); } 100% { opacity: 1; max-height: 1500px; transform: translateY(0); } }
 
-#rankForm > label, #rankForm > input, #rankForm > select, #rankForm > textarea, #rankForm > button, #rankForm > div { 
+form > label, form > input, form > select, form > textarea, form > button, form > div { 
     opacity: 0; animation: itemAppear 0.6s ease-out forwards; 
 }
 @keyframes itemAppear { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-#rankForm > *:nth-child(1) { animation-delay: 0.1s; }
-#rankForm > *:nth-child(2) { animation-delay: 0.15s; }
-#rankForm > *:nth-child(3) { animation-delay: 0.2s; }
-#rankForm > *:nth-child(4) { animation-delay: 0.25s; }
-#rankForm > *:nth-child(5) { animation-delay: 0.3s; }
-#rankForm > *:nth-child(6) { animation-delay: 0.35s; }
-#rankForm > *:nth-child(7) { animation-delay: 0.4s; }
-#rankForm > button { animation-delay: 0.5s; }
+form > *:nth-child(1) { animation-delay: 0.1s; }
+form > *:nth-child(2) { animation-delay: 0.15s; }
+form > *:nth-child(3) { animation-delay: 0.2s; }
+form > *:nth-child(4) { animation-delay: 0.25s; }
+form > *:nth-child(5) { animation-delay: 0.3s; }
+form > *:nth-child(6) { animation-delay: 0.35s; }
+form > *:nth-child(7) { animation-delay: 0.4s; }
+form > button { animation-delay: 0.5s; }
 
 label { display: block; margin-top: 18px; font-size: 10px; color: #777; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
 input, select, textarea { width: 100%; padding: 14px; margin-top: 8px; background: #131313; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; transition: border 0.2s; font-family: 'Inter', sans-serif; font-size: 16px; }
