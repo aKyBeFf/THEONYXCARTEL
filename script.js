@@ -33,6 +33,7 @@ const RANK_NAMES = {
 
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
 const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
+const WEBHOOK_DEPT = 'https://discord.com/api/webhooks/1453178584477728810/QQ3iulL-BQ3yQSRdYyHfcSK5Yg6CDGfIS3FZxhl2zhhCP4HUKRU0jobweprUv9CFo9CF';
 
 const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
 let userData = null;
@@ -322,6 +323,57 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
             document.getElementById('blacklistForm').reset(); 
+        } else { 
+            showError("Ошибка отправки в Discord"); 
+        } 
+    });
+});
+
+document.getElementById('deptForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!WEBHOOK_DEPT) { alert("Ошибка: Вебхук Отдела не настроен!"); return; }
+
+    const dept = document.getElementById('deptSelect').value;
+    const name = document.getElementById('deptName').value;
+    const age = document.getElementById('deptAge').value;
+    const why = document.getElementById('deptWhy').value;
+    const online = document.getElementById('deptOnline').value;
+    const clips = document.getElementById('deptClips').value;
+    const expProj = document.getElementById('deptExpProject').value;
+    const expFam = document.getElementById('deptExpFam').value;
+    const otherClips = document.getElementById('deptOtherClips').value || "Нет";
+
+    closeModal('deptModal');
+    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
+
+    const data = {
+        username: "Onyx Applications",
+        embeds: [{
+            title: `📂 ЗАЯВКА В ОТДЕЛ: ${dept}`,
+            color: 0x5865F2,
+            thumbnail: { url: avatarUrl },
+            fields: [
+                { name: "👤 Кандидат", value: `<@${userData.id}>`, inline: true },
+                { name: "🏷 Имя", value: name, inline: true },
+                { name: "🎂 Возраст", value: age, inline: true },
+                { name: "📝 Почему вы?", value: why, inline: false },
+                { name: "⏰ Онлайн", value: online, inline: true },
+                { name: "🔫 Откаты", value: clips, inline: false },
+                { name: "🌍 Опыт (Проекты)", value: expProj, inline: false },
+                { name: "🏰 Опыт (Семьи)", value: expFam, inline: false },
+                { name: "📹 Доп. откаты", value: otherClips, inline: false }
+            ],
+            footer: { text: `User ID: ${userData.id}` },
+            timestamp: new Date()
+        }]
+    };
+
+    fetch(WEBHOOK_DEPT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    .then(res => { 
+        if (res.ok || res.status === 204) { 
+            openModal('successModal'); 
+            document.getElementById('deptForm').reset(); 
         } else { 
             showError("Ошибка отправки в Discord"); 
         } 
