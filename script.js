@@ -47,7 +47,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupInputs() {
-
     function formatPassportInput(inputElement) {
         inputElement.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
@@ -59,13 +58,11 @@ function setupInputs() {
     formatPassportInput(document.getElementById('passportId'));
     formatPassportInput(document.getElementById('blId'));
 
-
-    let pressTimer;
-
     function setupAgeControl(minusBtnId, plusBtnId, inputId) {
         const minusBtn = document.getElementById(minusBtnId);
         const plusBtn = document.getElementById(plusBtnId);
         const input = document.getElementById(inputId);
+        let pressTimer;
 
         function changeValue(isPlus) {
             let val = parseInt(input.value) || 16;
@@ -76,31 +73,36 @@ function setupInputs() {
             }
         }
 
-
-        function handlePress(isPlus, btnElement) {
+        function startPress(isPlus) {
             changeValue(isPlus);
-
             pressTimer = setTimeout(() => {
-                 pressTimer = setInterval(() => changeValue(isPlus), 100);
+                pressTimer = setInterval(() => changeValue(isPlus), 80);
             }, 300);
-           
         }
 
+        function stopPress() {
+            clearTimeout(pressTimer);
+            clearInterval(pressTimer);
+        }
 
-        minusBtn.addEventListener('mousedown', () => handlePress(false, minusBtn));
-        plusBtn.addEventListener('mousedown', () => handlePress(true, plusBtn));
+        minusBtn.addEventListener('mousedown', () => startPress(false));
+        plusBtn.addEventListener('mousedown', () => startPress(true));
         
-
-        ['mouseup', 'mouseleave'].forEach(event => {
-            minusBtn.addEventListener(event, () => { clearTimeout(pressTimer); clearInterval(pressTimer); });
-            plusBtn.addEventListener(event, () => { clearTimeout(pressTimer); clearInterval(pressTimer); });
+        ['mouseup', 'mouseleave'].forEach(evt => {
+            minusBtn.addEventListener(evt, stopPress);
+            plusBtn.addEventListener(evt, stopPress);
+        });
+        
+        minusBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(false); });
+        plusBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startPress(true); });
+        ['touchend', 'touchcancel'].forEach(evt => {
+            minusBtn.addEventListener(evt, stopPress);
+            plusBtn.addEventListener(evt, stopPress);
         });
     }
 
-
     setupAgeControl('ageMinus', 'agePlus', 'age');
     setupAgeControl('sicAgeMinus', 'sicAgePlus', 'sicAge');
-
 
     document.getElementById('techDebugBtn').addEventListener('click', () => {
         const consoleDiv = document.getElementById('debugConsole');
@@ -115,6 +117,17 @@ function setupInputs() {
         consoleDiv.innerText = debugText;
         openModal('debugModal');
     });
+}
+
+function addLinkField() {
+    const container = document.getElementById('clipsContainer');
+    const div = document.createElement('div');
+    div.className = 'link-row';
+    div.innerHTML = `
+        <input type="text" class="link-input" placeholder="Ссылка на видео/скрин">
+        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">-</button>
+    `;
+    container.appendChild(div);
 }
 
 function switchTab(tab) {
@@ -339,10 +352,17 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     const age = document.getElementById('sicAge').value;
     const why = document.getElementById('sicWhy').value;
     const online = document.getElementById('sicOnline').value;
-    const clips = document.getElementById('sicClips').value;
     const expProj = document.getElementById('sicExpProj').value;
     const expFam = document.getElementById('sicExpFam').value;
     const otherClips = document.getElementById('sicOtherClips').value || "Нет";
+
+    let clips = "";
+    document.querySelectorAll('.link-input').forEach(input => {
+        if(input.value.trim() !== "") {
+            clips += input.value.trim() + "\n";
+        }
+    });
+    if(clips === "") clips = "Нет ссылок";
 
     let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
 
@@ -373,6 +393,12 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
             document.getElementById('sicariosForm').reset(); 
+            document.getElementById('clipsContainer').innerHTML = `
+                <div class="link-row">
+                    <input type="text" class="link-input" placeholder="Ссылка на видео/скрин" required>
+                    <button type="button" class="btn-add" onclick="addLinkField()">+</button>
+                </div>
+            `;
         } else { 
             showError("Ошибка отправки в Discord (Сикариос)"); 
         } 
