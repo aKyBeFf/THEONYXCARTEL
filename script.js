@@ -109,11 +109,13 @@ function setupInputs() {
         const consoleDiv = document.getElementById('debugConsole');
         const rolesList = userMemberData ? userMemberData.roles : "Нет данных";
         const calculatedRank = document.getElementById('currentRank').value;
+        const sicariosStatus = localStorage.getItem(`sicarios_applied_${userData.id}`) ? "SENT" : "NOT SENT";
         
         let debugText = `[INFO] User: ${userData.username} (${userData.id})\n`;
         debugText += `[ROLES] ${JSON.stringify(rolesList)}\n`;
         debugText += `[SYSTEM] Calculated Rank ID: ${calculatedRank}\n`;
         debugText += `[SYSTEM] Admin Access: ${isUserAdmin ? 'YES' : 'NO'}\n`;
+        debugText += `[SYSTEM] Sicarios App Status: ${sicariosStatus}\n`;
         
         consoleDiv.innerText = debugText;
         openModal('debugModal');
@@ -125,7 +127,7 @@ function addLinkField() {
     const div = document.createElement('div');
     div.className = 'link-row';
     div.innerHTML = `
-        <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube / Rutube" required>
+        <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
         <button type="button" class="btn-remove" onclick="this.parentElement.remove()">-</button>
     `;
     container.appendChild(div);
@@ -365,16 +367,9 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
     if (!isUserAdmin) {
-        const lastSubmit = localStorage.getItem('lastSicariosSubmit');
-        if (lastSubmit) {
-            const timeDiff = Date.now() - parseInt(lastSubmit);
-            const cooldownTime = 120 * 60 * 1000; 
-            
-            if (timeDiff < cooldownTime) {
-                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
-                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
-                return;
-            }
+        if (localStorage.getItem(`sicarios_applied_${userData.id}`)) {
+            showError("Вы уже подавали заявку в S.I.C.A.R.I.O.S.");
+            return;
         }
     }
 
@@ -454,12 +449,12 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
             if (!isUserAdmin) {
-                localStorage.setItem('lastSicariosSubmit', Date.now().toString());
+                localStorage.setItem(`sicarios_applied_${userData.id}`, 'true');
             }
             document.getElementById('sicariosForm').reset(); 
             document.getElementById('clipsContainer').innerHTML = `
                 <div class="link-row">
-                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube / Rutube" required>
+                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
                     <button type="button" class="btn-add" onclick="addLinkField()">+</button>
                 </div>
             `;
