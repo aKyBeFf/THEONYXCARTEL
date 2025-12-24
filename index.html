@@ -82,7 +82,11 @@
                 </div>
                 <div class="input-half">
                     <label>Возраст(от 16)</label>
-                    <input type="number" id="sicAge" placeholder="16" min="16" max="99" required>
+                    <div class="age-wrapper">
+                        <div class="age-btn" id="sicAgeMinus">-</div>
+                        <input type="number" id="sicAge" value="16" min="1" max="99" readonly>
+                        <div class="age-btn" id="sicAgePlus">+</div>
+                    </div>
                 </div>
             </div>
 
@@ -92,8 +96,8 @@
             <label>Средний онлайн в день</label>
             <input type="text" id="sicOnline" placeholder="Напр: 4-6 часов" required>
 
-            <label>Откаты перестрелок</label>
-            <input type="text" id="sicClips" placeholder="Ссылки (Imgur / YouTube)" required>
+            <label>Откаты перестрелок (Каждая ссылка с новой строки)</label>
+            <textarea id="sicClips" rows="3" placeholder="https://imgur.com/...\nhttps://youtube.com/..." required></textarea>
 
             <label>Был ли опыт на других проектах (какой?)</label>
             <textarea id="sicExpProj" rows="2" placeholder="Где играли ранее?" required></textarea>
@@ -101,8 +105,8 @@
             <label>Опыт на других серверах в фракциях/семей</label>
             <textarea id="sicExpFam" rows="2" placeholder="Кем были, чего добились?" required></textarea>
 
-            <label>Откаты с других серверов(если есть)</label>
-            <input type="text" id="sicOtherClips" placeholder="Не обязательно">
+            <label>Откаты с других серверов (если есть)</label>
+             <textarea id="sicOtherClips" rows="2" placeholder="Каждая ссылка с новой строки"></textarea>
 
             <button type="submit" class="submit-btn sicarios-submit">ОТПРАВИТЬ ЗАЯВКУ</button>
         </form>
