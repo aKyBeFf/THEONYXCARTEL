@@ -120,9 +120,8 @@ body {
     backdrop-filter: blur(10px); margin: 30px 0; 
 }
 
-
 .top-nav {
-    display: none;
+    display: none; 
     justify-content: center;
     gap: 15px;
     margin-bottom: 20px;
@@ -334,6 +333,7 @@ textarea { resize: vertical; min-height: 100px; }
     .form-card { padding: 25px; margin: 15px auto; width: 85%; }
     .logo-img { max-width: 120px; }
     .modal { padding: 30px 20px; }
+    .buttons-row { flex-direction: column; gap: 10px; }
 }
 
 .row-container {
@@ -402,6 +402,28 @@ textarea { resize: vertical; min-height: 100px; }
 .age-wrapper input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+.link-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.btn-add, .btn-remove {
+    width: 40px;
+    background: #1a1a1a;
+    color: #5865F2;
+    border: 1px solid #5865F2;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.btn-remove {
+    color: #ff4d4d;
+    border-color: #ff4d4d;
 }
 
 .debug-console {
