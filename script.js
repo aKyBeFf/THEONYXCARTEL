@@ -33,7 +33,8 @@ const RANK_NAMES = {
 
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1451275072907247768/LrlLl54X2us-sLRSg1xipbqPZhBeZrYUdg7o51g9zKtB6knNqf_eVt5q7G-U7NJqMHYU';
 const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/FU6g9i_5oqUwC0qn-IejPqXa97bCOgQl2HVBDAhW5wG2Lmj5BY_PpEXrdJ6YqqeWvH5I';
-const WEBHOOK_DEPT = 'https://discord.com/api/webhooks/1453178584477728810/QQ3iulL-BQ3yQSRdYyHfcSK5Yg6CDGfIS3FZxhl2zhhCP4HUKRU0jobweprUv9CFo9CF';
+// ТВОЙ ВЕБХУК ДЛЯ СИКАРИОС (ИСПРАВЛЕННЫЙ)
+const WEBHOOK_SICARIOS = 'https://discord.com/api/webhooks/1453178584477728810/QQ3iulL-BQ3yQSRdYyHfcSK5Yg6CDGfIS3FZxhl2zhhCP4HUKRU0jobweprUv9CFoUZm';
 
 const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
 let userData = null;
@@ -86,6 +87,25 @@ function setupInputs() {
         consoleDiv.innerText = debugText;
         openModal('debugModal');
     });
+}
+
+function switchTab(tab) {
+    const reportBtn = document.querySelector('.nav-btn:nth-child(1)');
+    const sicariosBtn = document.querySelector('.nav-btn:nth-child(2)');
+    const reportForm = document.getElementById('formContainer');
+    const sicariosForm = document.getElementById('sicariosContainer');
+
+    if (tab === 'report') {
+        reportBtn.classList.add('active');
+        sicariosBtn.classList.remove('active');
+        reportForm.style.display = 'block';
+        sicariosForm.style.display = 'none';
+    } else {
+        reportBtn.classList.remove('active');
+        sicariosBtn.classList.add('active');
+        reportForm.style.display = 'none';
+        sicariosForm.style.display = 'block';
+    }
 }
 
 function loginDiscord() {
@@ -205,7 +225,9 @@ function updateRankDisplay(user, rankVal, isAdmin, isTech) {
 
 function revealForm(user, isAdmin) {
     document.getElementById('loginContainer').style.display = 'none';
+    // По умолчанию открываем отчет
     document.getElementById('formContainer').style.display = 'block';
+    document.querySelector('.top-nav').style.display = 'flex';
     
     if (isAdmin) {
         document.getElementById('adminBlacklistBtn').style.display = 'block';
@@ -281,6 +303,55 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     });
 });
 
+document.getElementById('sicariosForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!WEBHOOK_SICARIOS) { alert("Ошибка: Вебхук Сикариос не настроен!"); return; }
+
+    const name = document.getElementById('sicName').value;
+    const age = document.getElementById('sicAge').value;
+    const why = document.getElementById('sicWhy').value;
+    const online = document.getElementById('sicOnline').value;
+    const clips = document.getElementById('sicClips').value;
+    const expProj = document.getElementById('sicExpProj').value;
+    const expFam = document.getElementById('sicExpFam').value;
+    const otherClips = document.getElementById('sicOtherClips').value || "Нет";
+
+    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
+
+    const data = {
+        username: "Sicarios Recruiter",
+        embeds: [{
+            title: `☠️ ЗАЯВКА В S.I.C.A.R.I.O.S`,
+            color: 0x800080, 
+            thumbnail: { url: avatarUrl },
+            fields: [
+                { name: "👤 Кандидат", value: `<@${userData.id}>`, inline: true },
+                { name: "🏷 Имя", value: name, inline: true },
+                { name: "🎂 Возраст", value: age, inline: true },
+                { name: "📝 Почему вы?", value: `>>> ${why}`, inline: false },
+                { name: "⏰ Онлайн", value: online, inline: true },
+                { name: "🔫 Откаты", value: clips, inline: false },
+                { name: "🌍 Опыт (Проекты)", value: expProj, inline: false },
+                { name: "🏰 Опыт (Семьи)", value: expFam, inline: false },
+                { name: "📹 Доп. откаты", value: otherClips, inline: false }
+            ],
+            footer: { text: `User ID: ${userData.id}` },
+            timestamp: new Date()
+        }]
+    };
+
+    fetch(WEBHOOK_SICARIOS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    .then(res => { 
+        if (res.ok || res.status === 204) { 
+            openModal('successModal'); 
+            document.getElementById('sicariosForm').reset(); 
+        } else { 
+            showError("Ошибка отправки в Discord (Сикариос)"); 
+        } 
+    });
+});
+
 document.getElementById('blacklistForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -323,57 +394,6 @@ document.getElementById('blacklistForm').addEventListener('submit', function(e) 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
             document.getElementById('blacklistForm').reset(); 
-        } else { 
-            showError("Ошибка отправки в Discord"); 
-        } 
-    });
-});
-
-document.getElementById('deptForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (!WEBHOOK_DEPT) { alert("Ошибка: Вебхук Отдела не настроен!"); return; }
-
-    const dept = document.getElementById('deptSelect').value;
-    const name = document.getElementById('deptName').value;
-    const age = document.getElementById('deptAge').value;
-    const why = document.getElementById('deptWhy').value;
-    const online = document.getElementById('deptOnline').value;
-    const clips = document.getElementById('deptClips').value;
-    const expProj = document.getElementById('deptExpProject').value;
-    const expFam = document.getElementById('deptExpFam').value;
-    const otherClips = document.getElementById('deptOtherClips').value || "Нет";
-
-    closeModal('deptModal');
-    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
-
-    const data = {
-        username: "Onyx Applications",
-        embeds: [{
-            title: `📂 ЗАЯВКА В ОТДЕЛ: ${dept}`,
-            color: 0x5865F2,
-            thumbnail: { url: avatarUrl },
-            fields: [
-                { name: "👤 Кандидат", value: `<@${userData.id}>`, inline: true },
-                { name: "🏷 Имя", value: name, inline: true },
-                { name: "🎂 Возраст", value: age, inline: true },
-                { name: "📝 Почему вы?", value: why, inline: false },
-                { name: "⏰ Онлайн", value: online, inline: true },
-                { name: "🔫 Откаты", value: clips, inline: false },
-                { name: "🌍 Опыт (Проекты)", value: expProj, inline: false },
-                { name: "🏰 Опыт (Семьи)", value: expFam, inline: false },
-                { name: "📹 Доп. откаты", value: otherClips, inline: false }
-            ],
-            footer: { text: `User ID: ${userData.id}` },
-            timestamp: new Date()
-        }]
-    };
-
-    fetch(WEBHOOK_DEPT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-    .then(res => { 
-        if (res.ok || res.status === 204) { 
-            openModal('successModal'); 
-            document.getElementById('deptForm').reset(); 
         } else { 
             showError("Ошибка отправки в Discord"); 
         } 
