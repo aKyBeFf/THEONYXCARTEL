@@ -38,6 +38,7 @@ const WEBHOOK_SICARIOS = 'https://discord.com/api/webhooks/1453178584477728810/Q
 const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
 let userData = null;
 let userMemberData = null; 
+let isUserAdmin = false;
 
 window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('mainLogo').src = LOGO_URL;
@@ -112,7 +113,7 @@ function setupInputs() {
         let debugText = `[INFO] User: ${userData.username} (${userData.id})\n`;
         debugText += `[ROLES] ${JSON.stringify(rolesList)}\n`;
         debugText += `[SYSTEM] Calculated Rank ID: ${calculatedRank}\n`;
-        debugText += `[SYSTEM] Admin Access: ${document.getElementById('adminBlacklistBtn').style.display === 'block' ? 'YES' : 'NO'}\n`;
+        debugText += `[SYSTEM] Admin Access: ${isUserAdmin ? 'YES' : 'NO'}\n`;
         
         consoleDiv.innerText = debugText;
         openModal('debugModal');
@@ -124,7 +125,7 @@ function addLinkField() {
     const div = document.createElement('div');
     div.className = 'link-row';
     div.innerHTML = `
-        <input type="text" class="link-input" placeholder="Ссылка на видео/скрин">
+        <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube / Rutube" required>
         <button type="button" class="btn-remove" onclick="this.parentElement.remove()">-</button>
     `;
     container.appendChild(div);
@@ -192,12 +193,12 @@ function checkGuildRoles(token, user) {
     .then(res => res.json())
     .then(member => {
         userMemberData = member; 
-        let isAdmin = false;
+        isUserAdmin = false;
         let isTech = false;
         let foundRank = 0;
 
         if (member.roles) {
-            isAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
+            isUserAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
             isTech = member.roles.includes(TECH_SUPPORT_ROLE_ID);
             
             for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
@@ -209,8 +210,8 @@ function checkGuildRoles(token, user) {
             }
         }
         
-        revealForm(user, isAdmin);
-        updateRankDisplay(user, foundRank, isAdmin, isTech);
+        revealForm(user, isUserAdmin);
+        updateRankDisplay(user, foundRank, isUserAdmin, isTech);
     })
     .catch(err => {
         console.error(err);
@@ -299,6 +300,20 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
         return;
     }
 
+    if (!isUserAdmin) {
+        const lastSubmit = localStorage.getItem('lastPromotionSubmit');
+        if (lastSubmit) {
+            const timeDiff = Date.now() - parseInt(lastSubmit);
+            const cooldownTime = 60 * 60 * 1000; 
+            
+            if (timeDiff < cooldownTime) {
+                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
+                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
+                return;
+            }
+        }
+    }
+
     if (!WEBHOOK_URL) { alert("Ошибка: Вебхук не настроен!"); return; }
 
     const fullName = document.getElementById('fullname').value;
@@ -335,6 +350,9 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     .then(res => { 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
+            if (!isUserAdmin) {
+                localStorage.setItem('lastPromotionSubmit', Date.now().toString());
+            }
             document.getElementById('rankForm').reset(); 
             checkGuildRoles(localStorage.getItem('discord_token'), userData);
         } else { 
@@ -346,6 +364,20 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
 document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    if (!isUserAdmin) {
+        const lastSubmit = localStorage.getItem('lastSicariosSubmit');
+        if (lastSubmit) {
+            const timeDiff = Date.now() - parseInt(lastSubmit);
+            const cooldownTime = 120 * 60 * 1000; 
+            
+            if (timeDiff < cooldownTime) {
+                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
+                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
+                return;
+            }
+        }
+    }
+
     if (!WEBHOOK_SICARIOS) { alert("Ошибка: Вебхук Сикариос не настроен!"); return; }
 
     const name = document.getElementById('sicName').value;
@@ -354,16 +386,45 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     const online = document.getElementById('sicOnline').value;
     const expProj = document.getElementById('sicExpProj').value;
     const expFam = document.getElementById('sicExpFam').value;
-    const otherClips = document.getElementById('sicOtherClips').value || "Нет";
+    const otherClipsRaw = document.getElementById('sicOtherClips').value.trim();
 
     let clips = "";
-    document.querySelectorAll('.link-input').forEach(input => {
-        if(input.value.trim() !== "") {
-            clips += input.value.trim() + "\n";
+    let hasInvalidLink = false;
+    
+    document.querySelectorAll('.sic-video-link').forEach(input => {
+        const val = input.value.trim();
+        if(val !== "") {
+            if (!isValidVideoLink(val)) {
+                hasInvalidLink = true;
+                input.style.borderColor = 'red';
+            } else {
+                input.style.borderColor = '#5865F2';
+                clips += val + "\n";
+            }
         }
     });
-    if(clips === "") clips = "Нет ссылок";
 
+    if (otherClipsRaw !== "") {
+        if (!isValidVideoLink(otherClipsRaw)) {
+            showError("Ссылка 'Откаты с других серверов' должна быть на YouTube или Rutube!");
+            document.getElementById('sicOtherClips').style.borderColor = 'red';
+            return;
+        } else {
+            document.getElementById('sicOtherClips').style.borderColor = '#333';
+        }
+    }
+
+    if (hasInvalidLink) {
+        showError("Все ссылки на откаты должны быть с YouTube или Rutube!");
+        return;
+    }
+
+    if(clips === "") {
+        showError("Укажите хотя бы один откат перестрелки!");
+        return;
+    }
+
+    const otherClips = otherClipsRaw || "Нет";
     let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
 
     const data = {
@@ -392,10 +453,13 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     .then(res => { 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
+            if (!isUserAdmin) {
+                localStorage.setItem('lastSicariosSubmit', Date.now().toString());
+            }
             document.getElementById('sicariosForm').reset(); 
             document.getElementById('clipsContainer').innerHTML = `
                 <div class="link-row">
-                    <input type="text" class="link-input" placeholder="Ссылка на видео/скрин" required>
+                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube / Rutube" required>
                     <button type="button" class="btn-add" onclick="addLinkField()">+</button>
                 </div>
             `;
@@ -404,6 +468,10 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
         } 
     });
 });
+
+function isValidVideoLink(url) {
+    return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("rutube.ru");
+}
 
 document.getElementById('blacklistForm').addEventListener('submit', function(e) {
     e.preventDefault();
