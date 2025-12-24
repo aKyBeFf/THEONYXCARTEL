@@ -2,7 +2,13 @@ const LOGO_URL = 'https://i.imgur.com/I7sZuLM.jpeg';
 
 const CLIENT_ID = '1451284313109954650'; 
 const GUILD_ID = '1451234520006266933';
-const ADMIN_ROLE_IDS = ['1451258370127429804', '1451257290702196827', '1451348634359697418']; 
+
+const ADMIN_ROLE_IDS = [
+    '1451258370127429804', 
+    '1451257290702196827', 
+    '1451348634359697418'
+]; 
+
 const TECH_SUPPORT_ROLE_ID = '1451736104498888899';
 
 const RANK_ROLE_IDS = {
@@ -36,6 +42,7 @@ const WEBHOOK_BLACKLIST = 'https://discord.com/api/webhooks/1451685341089108181/
 const WEBHOOK_SICARIOS = 'https://discord.com/api/webhooks/1453178584477728810/QQ3iulL-BQ3yQSRdYyHfcSK5Yg6CDGfIS3FZxhl2zhhCP4HUKRU0jobweprUv9CFoUZm';
 
 const REDIRECT_URI = 'https://akybeff.github.io/THEONYXCARTEL/';
+
 let userData = null;
 let userMemberData = null; 
 let isUserAdmin = false;
@@ -46,6 +53,332 @@ window.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     setupInputs();
 });
+
+function checkAuth() {
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    let accessToken = fragment.get('access_token');
+
+    if (accessToken) {
+        localStorage.setItem('discord_token', accessToken);
+        window.history.replaceState({}, document.title, REDIRECT_URI);
+    } else {
+        accessToken = localStorage.getItem('discord_token');
+    }
+
+    if (accessToken) {
+        fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${accessToken}` } })
+        .then(res => {
+            if (!res.ok) throw new Error('Token expired');
+            return res.json();
+        })
+        .then(data => { 
+            userData = data; 
+            console.log(`[AUTH] User: ${userData.username} | ID: ${userData.id}`);
+            checkGuildRoles(accessToken, data);
+        })
+        .catch(err => { 
+            console.log(err);
+            localStorage.removeItem('discord_token');
+            document.getElementById('loginContainer').style.display = 'block';
+        });
+    } else {
+        document.getElementById('loginContainer').style.display = 'block';
+    }
+}
+
+function checkGuildRoles(token, user) {
+    fetch(`https://discord.com/api/users/@me/guilds/${GUILD_ID}/member`, { 
+        headers: { Authorization: `Bearer ${token}` } 
+    })
+    .then(res => res.json())
+    .then(member => {
+        userMemberData = member; 
+        
+        isUserAdmin = false;
+        if (member.roles) {
+            isUserAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
+        }
+
+        console.log(`[AUTH] Admin Access: ${isUserAdmin}`);
+        
+        let isTech = false;
+        let foundRank = 0;
+        if (member.roles) {
+            isTech = member.roles.includes(TECH_SUPPORT_ROLE_ID);
+            for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
+                if (member.roles.includes(roleId)) {
+                    if (parseInt(rankVal) > foundRank) foundRank = parseInt(rankVal);
+                }
+            }
+        }
+        
+        revealForm(user, isUserAdmin);
+        updateRankDisplay(user, foundRank, isUserAdmin, isTech);
+        
+        updateButtonStates();
+    })
+    .catch(err => {
+        console.error("Guild fetch error:", err);
+        revealForm(user, false); 
+        updateButtonStates();
+    });
+}
+
+function getSpamStatus(type) {
+    if (!userData || !userData.id) return { allowed: false, msg: "Нет данных пользователя" };
+    if (isUserAdmin) return { allowed: true, msg: "Администратор" };
+
+    if (type === 'report') {
+        const key = `onyx_timer_report_${userData.id}`;
+        const lastSubmit = localStorage.getItem(key);
+        if (lastSubmit) {
+            const timeDiff = Date.now() - parseInt(lastSubmit);
+            const cooldown = 60 * 60 * 1000; 
+            if (timeDiff < cooldown) {
+                const minLeft = Math.ceil((cooldown - timeDiff) / 60000);
+                return { allowed: false, msg: `Таймер: ${minLeft} мин.` };
+            }
+        }
+    } else if (type === 'sicarios') {
+        const key = `onyx_lock_sicarios_${userData.id}`;
+        if (localStorage.getItem(key) === 'true') {
+            return { allowed: false, msg: "Вы уже подали заявку" };
+        }
+    }
+    return { allowed: true, msg: "OK" };
+}
+
+function setSpamLock(type) {
+    if (isUserAdmin || !userData) return;
+    
+    if (type === 'report') {
+        localStorage.setItem(`onyx_timer_report_${userData.id}`, Date.now().toString());
+    } else if (type === 'sicarios') {
+        localStorage.setItem(`onyx_lock_sicarios_${userData.id}`, 'true');
+    }
+    updateButtonStates(); 
+}
+
+function updateButtonStates() {
+    const reportBtn = document.getElementById('submitBtn');
+    const reportStatus = getSpamStatus('report');
+    
+    if (!reportStatus.allowed) {
+        reportBtn.disabled = true;
+        reportBtn.innerText = `⛔ ${reportStatus.msg}`;
+        reportBtn.style.opacity = "0.5";
+        reportBtn.style.cursor = "not-allowed";
+    } else {
+        reportBtn.disabled = false;
+        reportBtn.innerText = "ОТПРАВИТЬ ОТЧЕТ";
+        reportBtn.style.opacity = "1";
+        reportBtn.style.cursor = "pointer";
+    }
+
+    const sicBtn = document.querySelector('.sicarios-submit');
+    if (sicBtn) {
+        const sicStatus = getSpamStatus('sicarios');
+        if (!sicStatus.allowed) {
+            sicBtn.disabled = true;
+            sicBtn.innerText = `⛔ ${sicStatus.msg}`;
+            sicBtn.style.opacity = "0.5";
+            sicBtn.style.cursor = "not-allowed";
+            sicBtn.style.background = "#333";
+        } else {
+            sicBtn.disabled = false;
+            sicBtn.innerText = "ОТПРАВИТЬ ЗАЯВКУ";
+            sicBtn.style.opacity = "1";
+            sicBtn.style.cursor = "pointer";
+            sicBtn.style.background = "#800080";
+        }
+    }
+}
+
+document.getElementById('rankForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const status = getSpamStatus('report');
+    if (!status.allowed) {
+        showError(`Ошибка: ${status.msg}`);
+        return;
+    }
+
+    const passportId = document.getElementById('passportId').value; 
+    if (passportId.length !== 7 || !passportId.includes('-')) {
+        showError("ID Паспорта должен быть в формате XXX-XXX");
+        return;
+    }
+
+    if (!WEBHOOK_URL) { alert("Вебхук не настроен!"); return; }
+
+    const submitButton = document.getElementById('submitBtn');
+    submitButton.disabled = true;
+    submitButton.innerText = "Отправка...";
+
+    const fullName = document.getElementById('fullname').value;
+    const age = document.getElementById('age').value;
+    const reason = document.getElementById('promoteReason').value;
+    const currentRankName = RANK_NAMES[document.getElementById('currentRank').value] || "Неизвестно";
+    const nextRankName = document.getElementById('newRank').value;
+    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
+
+    const data = {
+        username: "Onyx System",
+        embeds: [{
+            title: "📄 ЗАЯВЛЕНИЕ НА ПОВЫШЕНИЕ",
+            color: 0x99aab5,
+            thumbnail: { url: avatarUrl },
+            image: { url: LOGO_URL }, 
+            fields: [
+                { name: "👤 Агент", value: `<@${userData.id}>`, inline: true },
+                { name: "🏷 Позывной", value: `**${fullName}**`, inline: true },
+                { name: "🎂 Возраст", value: `${age} лет`, inline: true },
+                { name: "🆔 ID", value: `**${passportId}**`, inline: true },
+                { name: "📈 Повышение", value: `${currentRankName} ➡ ${nextRankName}`, inline: false },
+                { name: "📝 Почему должны повысить?", value: `>>> ${reason}`, inline: false }
+            ],
+            footer: { text: `Security ID: ${userData.id}` },
+            timestamp: new Date()
+        }]
+    };
+
+    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    .then(res => { 
+        if (res.ok || res.status === 204) { 
+            openModal('successModal'); 
+            setSpamLock('report'); 
+            document.getElementById('rankForm').reset(); 
+            checkGuildRoles(localStorage.getItem('discord_token'), userData);
+        } else { 
+            showError("Ошибка отправки в Discord"); 
+            updateButtonStates(); 
+        } 
+    })
+    .catch(() => updateButtonStates());
+});
+
+document.getElementById('sicariosForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const status = getSpamStatus('sicarios');
+    if (!status.allowed) {
+        showError(`Ошибка: ${status.msg}`);
+        return;
+    }
+
+    if (!WEBHOOK_SICARIOS) { alert("Вебхук Сикариос не настроен!"); return; }
+
+    const submitButton = document.querySelector('.sicarios-submit');
+    submitButton.disabled = true;
+    submitButton.innerText = "Отправка...";
+
+    const name = document.getElementById('sicName').value;
+    const age = document.getElementById('sicAge').value;
+    const why = document.getElementById('sicWhy').value;
+    const online = document.getElementById('sicOnline').value;
+    const expProj = document.getElementById('sicExpProj').value;
+    const expFam = document.getElementById('sicExpFam').value;
+    const otherClipsRaw = document.getElementById('sicOtherClips').value.trim();
+
+    let clips = "";
+    let hasInvalidLink = false;
+    document.querySelectorAll('.sic-video-link').forEach(input => {
+        const val = input.value.trim();
+        if(val !== "") {
+            if (!isValidVideoLink(val)) {
+                hasInvalidLink = true;
+                input.style.borderColor = 'red';
+            } else {
+                input.style.borderColor = '#5865F2';
+                clips += val + "\n";
+            }
+        }
+    });
+
+    if (otherClipsRaw !== "" && !isValidVideoLink(otherClipsRaw)) {
+        showError("Ссылка 'Доп. откаты' должна быть YouTube/Rutube!");
+        updateButtonStates();
+        return;
+    }
+    if (hasInvalidLink) {
+        showError("Все ссылки должны быть YouTube/Rutube!");
+        updateButtonStates();
+        return;
+    }
+    if(clips === "") {
+        showError("Укажите хотя бы один откат!");
+        updateButtonStates();
+        return;
+    }
+
+    const otherClips = otherClipsRaw || "Нет";
+    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
+
+    const data = {
+        username: "Sicarios Recruiter",
+        embeds: [{
+            title: `☠️ ЗАЯВКА В S.I.C.A.R.I.O.S`,
+            color: 0x800080, 
+            thumbnail: { url: avatarUrl },
+            fields: [
+                { name: "👤 Кандидат", value: `<@${userData.id}>`, inline: true },
+                { name: "🏷 Имя", value: name, inline: true },
+                { name: "🎂 Возраст", value: age, inline: true },
+                { name: "📝 Почему вы?", value: `>>> ${why}`, inline: false },
+                { name: "⏰ Онлайн", value: online, inline: true },
+                { name: "🔫 Откаты", value: `>>> ${clips}`, inline: false },
+                { name: "🌍 Опыт (Проекты)", value: expProj, inline: false },
+                { name: "🏰 Опыт (Семьи)", value: expFam, inline: false },
+                { name: "📹 Доп. откаты", value: `>>> ${otherClips}`, inline: false }
+            ],
+            footer: { text: `User ID: ${userData.id}` },
+            timestamp: new Date()
+        }]
+    };
+
+    fetch(WEBHOOK_SICARIOS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    .then(res => { 
+        if (res.ok || res.status === 204) { 
+            openModal('successModal'); 
+            setSpamLock('sicarios'); 
+            document.getElementById('sicariosForm').reset(); 
+            document.getElementById('clipsContainer').innerHTML = `
+                <div class="link-row">
+                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
+                    <button type="button" class="btn-add" onclick="addLinkField()">+</button>
+                </div>
+            `;
+        } else { 
+            showError("Ошибка отправки в Discord"); 
+            updateButtonStates();
+        } 
+    })
+    .catch(() => updateButtonStates());
+});
+
+function isValidVideoLink(url) {
+    return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("rutube.ru");
+}
+
+function switchTab(tab) {
+    const reportBtn = document.querySelector('.nav-btn:nth-child(1)');
+    const sicariosBtn = document.querySelector('.nav-btn:nth-child(2)');
+    const reportForm = document.getElementById('formContainer');
+    const sicariosForm = document.getElementById('sicariosContainer');
+
+    if (tab === 'report') {
+        reportBtn.classList.add('active');
+        sicariosBtn.classList.remove('active');
+        reportForm.style.display = 'block';
+        sicariosForm.style.display = 'none';
+    } else {
+        reportBtn.classList.remove('active');
+        sicariosBtn.classList.add('active');
+        reportForm.style.display = 'none';
+        sicariosForm.style.display = 'block';
+    }
+    updateButtonStates();
+}
 
 function setupInputs() {
     function formatPassportInput(inputElement) {
@@ -108,49 +441,18 @@ function setupInputs() {
     document.getElementById('techDebugBtn').addEventListener('click', () => {
         const consoleDiv = document.getElementById('debugConsole');
         const rolesList = userMemberData ? userMemberData.roles : "Нет данных";
-        const calculatedRank = document.getElementById('currentRank').value;
-        const sicKey = userData ? `onyx_sicarios_lock_${userData.id}` : null;
-        const sicariosStatus = (sicKey && localStorage.getItem(sicKey)) ? "SENT" : "NOT SENT";
         
-        let debugText = `[INFO] User: ${userData.username} (${userData.id})\n`;
-        debugText += `[ROLES] ${JSON.stringify(rolesList)}\n`;
-        debugText += `[SYSTEM] Calculated Rank ID: ${calculatedRank}\n`;
-        debugText += `[SYSTEM] Admin Access: ${isUserAdmin ? 'YES' : 'NO'}\n`;
-        debugText += `[SYSTEM] Sicarios App Status: ${sicariosStatus}\n`;
+        const reportStatus = getSpamStatus('report');
+        const sicStatus = getSpamStatus('sicarios');
+
+        let debugText = `[INFO] User: ${userData ? userData.username : 'Loading'} (${userData ? userData.id : '?'})\n`;
+        debugText += `[ADMIN] Is Admin: ${isUserAdmin} (Roles: ${JSON.stringify(rolesList)})\n`;
+        debugText += `[SPAM] Report Allowed: ${reportStatus.allowed} (${reportStatus.msg})\n`;
+        debugText += `[SPAM] Sicarios Allowed: ${sicStatus.allowed} (${sicStatus.msg})\n`;
         
         consoleDiv.innerText = debugText;
         openModal('debugModal');
     });
-}
-
-function addLinkField() {
-    const container = document.getElementById('clipsContainer');
-    const div = document.createElement('div');
-    div.className = 'link-row';
-    div.innerHTML = `
-        <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
-        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">-</button>
-    `;
-    container.appendChild(div);
-}
-
-function switchTab(tab) {
-    const reportBtn = document.querySelector('.nav-btn:nth-child(1)');
-    const sicariosBtn = document.querySelector('.nav-btn:nth-child(2)');
-    const reportForm = document.getElementById('formContainer');
-    const sicariosForm = document.getElementById('sicariosContainer');
-
-    if (tab === 'report') {
-        reportBtn.classList.add('active');
-        sicariosBtn.classList.remove('active');
-        reportForm.style.display = 'block';
-        sicariosForm.style.display = 'none';
-    } else {
-        reportBtn.classList.remove('active');
-        sicariosBtn.classList.add('active');
-        reportForm.style.display = 'none';
-        sicariosForm.style.display = 'block';
-    }
 }
 
 function loginDiscord() {
@@ -158,68 +460,17 @@ function loginDiscord() {
     window.location.href = url;
 }
 
-function checkAuth() {
-    const fragment = new URLSearchParams(window.location.hash.slice(1));
-    let accessToken = fragment.get('access_token');
-
-    if (accessToken) {
-        localStorage.setItem('discord_token', accessToken);
-        window.history.replaceState({}, document.title, REDIRECT_URI);
-    } else {
-        accessToken = localStorage.getItem('discord_token');
+function revealForm(user, isAdmin) {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('formContainer').style.display = 'block';
+    document.querySelector('.top-nav').style.display = 'flex';
+    
+    if (isAdmin) {
+        document.getElementById('adminBlacklistBtn').style.display = 'block';
     }
 
-    if (accessToken) {
-        fetch('https://discord.com/api/users/@me', { headers: { Authorization: `Bearer ${accessToken}` } })
-        .then(res => {
-            if (!res.ok) throw new Error('Token expired');
-            return res.json();
-        })
-        .then(data => { 
-            userData = data; 
-            checkGuildRoles(accessToken, data);
-        })
-        .catch(err => { 
-            console.log(err);
-            localStorage.removeItem('discord_token');
-            document.getElementById('loginContainer').style.display = 'block';
-        });
-    } else {
-        document.getElementById('loginContainer').style.display = 'block';
-    }
-}
-
-function checkGuildRoles(token, user) {
-    fetch(`https://discord.com/api/users/@me/guilds/${GUILD_ID}/member`, { 
-        headers: { Authorization: `Bearer ${token}` } 
-    })
-    .then(res => res.json())
-    .then(member => {
-        userMemberData = member; 
-        isUserAdmin = false;
-        let isTech = false;
-        let foundRank = 0;
-
-        if (member.roles) {
-            isUserAdmin = member.roles.some(roleId => ADMIN_ROLE_IDS.includes(roleId));
-            isTech = member.roles.includes(TECH_SUPPORT_ROLE_ID);
-            
-            for (let [rankVal, roleId] of Object.entries(RANK_ROLE_IDS)) {
-                if (member.roles.includes(roleId)) {
-                    if (parseInt(rankVal) > foundRank) {
-                        foundRank = parseInt(rankVal);
-                    }
-                }
-            }
-        }
-        
-        revealForm(user, isUserAdmin);
-        updateRankDisplay(user, foundRank, isUserAdmin, isTech);
-    })
-    .catch(err => {
-        console.error(err);
-        revealForm(user, false); 
-    });
+    const profile = document.getElementById('topProfile');
+    profile.style.display = 'flex';
 }
 
 function updateRankDisplay(user, rankVal, isAdmin, isTech) {
@@ -268,19 +519,6 @@ function updateRankDisplay(user, rankVal, isAdmin, isTech) {
     updateNextRank(rankVal);
 }
 
-function revealForm(user, isAdmin) {
-    document.getElementById('loginContainer').style.display = 'none';
-    document.getElementById('formContainer').style.display = 'block';
-    document.querySelector('.top-nav').style.display = 'flex';
-    
-    if (isAdmin) {
-        document.getElementById('adminBlacklistBtn').style.display = 'block';
-    }
-
-    const profile = document.getElementById('topProfile');
-    profile.style.display = 'flex';
-}
-
 function updateNextRank(currentVal) {
     const nextRankInput = document.getElementById('newRank');
     const nextVal = parseInt(currentVal) + 1;
@@ -294,201 +532,20 @@ function updateNextRank(currentVal) {
     }
 }
 
-function checkSpamProtection(type) {
-    if (isUserAdmin) return true;
-    if (!userData || !userData.id) return false;
-
-    if (type === 'report') {
-        const key = `onyx_cooldown_report_${userData.id}`;
-        const lastSubmit = localStorage.getItem(key);
-        if (lastSubmit) {
-            const timeDiff = Date.now() - parseInt(lastSubmit);
-            const cooldownTime = 60 * 60 * 1000;
-            if (timeDiff < cooldownTime) {
-                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
-                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
-                return false;
-            }
-        }
-    } else if (type === 'sicarios') {
-        const key = `onyx_sicarios_lock_${userData.id}`;
-        if (localStorage.getItem(key)) {
-            showError("Вы уже подавали заявку в S.I.C.A.R.I.O.S.");
-            return false;
-        }
-    }
-    return true;
-}
-
-function activateSpamProtection(type) {
-    if (isUserAdmin) return;
-    if (!userData || !userData.id) return;
-
-    if (type === 'report') {
-        localStorage.setItem(`onyx_cooldown_report_${userData.id}`, Date.now().toString());
-    } else if (type === 'sicarios') {
-        localStorage.setItem(`onyx_sicarios_lock_${userData.id}`, 'true');
-    }
-}
-
-document.getElementById('rankForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (!checkSpamProtection('report')) return;
-
-    const passportId = document.getElementById('passportId').value; 
-    if (passportId.length !== 7 || !passportId.includes('-')) {
-        showError("ID Паспорта должен быть в формате XXX-XXX (например, 543-621)");
-        return;
-    }
-
-    if (!WEBHOOK_URL) { alert("Ошибка: Вебхук не настроен!"); return; }
-
-    const fullName = document.getElementById('fullname').value;
-    const age = document.getElementById('age').value;
-    const reason = document.getElementById('promoteReason').value;
-    
-    const currentRankValue = document.getElementById('currentRank').value;
-    const currentRankName = RANK_NAMES[currentRankValue] || "Неизвестно";
-    const nextRankName = document.getElementById('newRank').value;
-    
-    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
-
-    const data = {
-        username: "Onyx System",
-        embeds: [{
-            title: "📄 ЗАЯВЛЕНИЕ НА ПОВЫШЕНИЕ",
-            color: 0x99aab5,
-            thumbnail: { url: avatarUrl },
-            image: { url: LOGO_URL }, 
-            fields: [
-                { name: "👤 Агент", value: `<@${userData.id}>`, inline: true },
-                { name: "🏷 Позывной", value: `**${fullName}**`, inline: true },
-                { name: "🎂 Возраст", value: `${age} лет`, inline: true },
-                { name: "🆔 ID", value: `**${passportId}**`, inline: true },
-                { name: "📈 Повышение", value: `${currentRankName} ➡ ${nextRankName}`, inline: false },
-                { name: "📝 Почему должны повысить?", value: `>>> ${reason}`, inline: false }
-            ],
-            footer: { text: `Security ID: ${userData.id}` },
-            timestamp: new Date()
-        }]
-    };
-
-    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-    .then(res => { 
-        if (res.ok || res.status === 204) { 
-            openModal('successModal'); 
-            activateSpamProtection('report');
-            document.getElementById('rankForm').reset(); 
-            checkGuildRoles(localStorage.getItem('discord_token'), userData);
-        } else { 
-            showError("Ошибка отправки в Discord"); 
-        } 
-    });
-});
-
-document.getElementById('sicariosForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (!checkSpamProtection('sicarios')) return;
-
-    if (!WEBHOOK_SICARIOS) { alert("Ошибка: Вебхук Сикариос не настроен!"); return; }
-
-    const name = document.getElementById('sicName').value;
-    const age = document.getElementById('sicAge').value;
-    const why = document.getElementById('sicWhy').value;
-    const online = document.getElementById('sicOnline').value;
-    const expProj = document.getElementById('sicExpProj').value;
-    const expFam = document.getElementById('sicExpFam').value;
-    const otherClipsRaw = document.getElementById('sicOtherClips').value.trim();
-
-    let clips = "";
-    let hasInvalidLink = false;
-    
-    document.querySelectorAll('.sic-video-link').forEach(input => {
-        const val = input.value.trim();
-        if(val !== "") {
-            if (!isValidVideoLink(val)) {
-                hasInvalidLink = true;
-                input.style.borderColor = 'red';
-            } else {
-                input.style.borderColor = '#5865F2';
-                clips += val + "\n";
-            }
-        }
-    });
-
-    if (otherClipsRaw !== "") {
-        if (!isValidVideoLink(otherClipsRaw)) {
-            showError("Ссылка 'Откаты с других серверов' должна быть на YouTube или Rutube!");
-            document.getElementById('sicOtherClips').style.borderColor = 'red';
-            return;
-        } else {
-            document.getElementById('sicOtherClips').style.borderColor = '#333';
-        }
-    }
-
-    if (hasInvalidLink) {
-        showError("Все ссылки на откаты должны быть с YouTube или Rutube!");
-        return;
-    }
-
-    if(clips === "") {
-        showError("Укажите хотя бы один откат перестрелки!");
-        return;
-    }
-
-    const otherClips = otherClipsRaw || "Нет";
-    let avatarUrl = userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png` : LOGO_URL;
-
-    const data = {
-        username: "Sicarios Recruiter",
-        embeds: [{
-            title: `☠️ ЗАЯВКА В S.I.C.A.R.I.O.S`,
-            color: 0x800080, 
-            thumbnail: { url: avatarUrl },
-            fields: [
-                { name: "👤 Кандидат", value: `<@${userData.id}>`, inline: true },
-                { name: "🏷 Имя", value: name, inline: true },
-                { name: "🎂 Возраст", value: age, inline: true },
-                { name: "📝 Почему вы?", value: `>>> ${why}`, inline: false },
-                { name: "⏰ Онлайн", value: online, inline: true },
-                { name: "🔫 Откаты", value: `>>> ${clips}`, inline: false },
-                { name: "🌍 Опыт (Проекты)", value: expProj, inline: false },
-                { name: "🏰 Опыт (Семьи)", value: expFam, inline: false },
-                { name: "📹 Доп. откаты", value: `>>> ${otherClips}`, inline: false }
-            ],
-            footer: { text: `User ID: ${userData.id}` },
-            timestamp: new Date()
-        }]
-    };
-
-    fetch(WEBHOOK_SICARIOS, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-    .then(res => { 
-        if (res.ok || res.status === 204) { 
-            openModal('successModal'); 
-            activateSpamProtection('sicarios');
-            document.getElementById('sicariosForm').reset(); 
-            document.getElementById('clipsContainer').innerHTML = `
-                <div class="link-row">
-                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
-                    <button type="button" class="btn-add" onclick="addLinkField()">+</button>
-                </div>
-            `;
-        } else { 
-            showError("Ошибка отправки в Discord (Сикариос)"); 
-        } 
-    });
-});
-
-function isValidVideoLink(url) {
-    return url.includes("youtube.com") || url.includes("youtu.be") || url.includes("rutube.ru");
+function addLinkField() {
+    const container = document.getElementById('clipsContainer');
+    const div = document.createElement('div');
+    div.className = 'link-row';
+    div.innerHTML = `
+        <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube или Rutube" required>
+        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">-</button>
+    `;
+    container.appendChild(div);
 }
 
 document.getElementById('blacklistForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    if (!WEBHOOK_BLACKLIST) { alert("Ошибка: Вебхук ЧС не настроен!"); return; }
+    if (!WEBHOOK_BLACKLIST) { alert("Вебхук ЧС не настроен!"); return; }
 
     const name = document.getElementById('blName').value;
     const id = document.getElementById('blId').value;
@@ -537,16 +594,12 @@ function openModal(modalId) {
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
     overlay.style.display = 'flex'; 
-    setTimeout(() => { 
-        overlay.classList.add('active'); 
-        modal.classList.add('active');
-    }, 10); 
+    setTimeout(() => { overlay.classList.add('active'); modal.classList.add('active'); }, 10); 
 }
 function closeModal(modalId) { 
     const overlay = document.getElementById('modalOverlay');
     const modal = document.getElementById(modalId);
-    overlay.classList.remove('active'); 
-    modal.classList.remove('active');
+    overlay.classList.remove('active'); modal.classList.remove('active');
     setTimeout(() => { overlay.style.display = 'none'; }, 400); 
 }
 function showError(msg) {
