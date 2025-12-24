@@ -24,7 +24,7 @@
 <div class="form-card">
     
     <div class="top-nav">
-        <button class="nav-btn active" onclick="switchTab('report')">ОТЧЕТ</button>
+        <button class="nav-btn active" onclick="switchTab('report')">ПОВЫШЕНИЕ</button>
         <button class="nav-btn sicarios-btn" onclick="switchTab('sicarios')">S.I.C.A.R.I.O.S</button>
     </div>
 
@@ -96,10 +96,10 @@
             <label>Средний онлайн в день</label>
             <input type="text" id="sicOnline" placeholder="Напр: 4-6 часов" required>
 
-            <label>Откаты перестрелок</label>
+            <label>Откаты перестрелок (YouTube / Rutube)</label>
             <div id="clipsContainer">
                 <div class="link-row">
-                    <input type="text" class="link-input" placeholder="Ссылка на видео/скрин" required>
+                    <input type="text" class="link-input sic-video-link" placeholder="Ссылка на YouTube / Rutube" required>
                     <button type="button" class="btn-add" onclick="addLinkField()">+</button>
                 </div>
             </div>
@@ -110,8 +110,8 @@
             <label>Опыт на других серверах в фракциях/семей</label>
             <textarea id="sicExpFam" rows="2" placeholder="Кем были, чего добились?" required></textarea>
 
-            <label>Откаты с других серверов(если есть)</label>
-            <input type="text" id="sicOtherClips" placeholder="Не обязательно">
+            <label>Откаты с других серверов (YouTube / Rutube)</label>
+            <input type="text" id="sicOtherClips" placeholder="Ссылка (если есть)">
 
             <button type="submit" class="submit-btn sicarios-submit">ОТПРАВИТЬ ЗАЯВКУ</button>
         </form>
