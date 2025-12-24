@@ -64,9 +64,10 @@
             <button type="submit" id="submitBtn" class="submit-btn">Отправить отчет</button>
         </form>
 
-        <button id="adminBlacklistBtn" class="btn-danger-onyx" style="display: none;" onclick="openModal('blacklistModal')">
-            ⚠️ Управление Черным Списком
-        </button>
+        <div class="buttons-row">
+            <button class="btn-dept" onclick="openModal('deptModal')">📂 Подать заявку в отдел</button>
+            <button id="adminBlacklistBtn" class="btn-danger-onyx" style="display: none;" onclick="openModal('blacklistModal')">⚠️ Черный Список</button>
+        </div>
     </div>
 
     <div class="branding">© THE ONYX CARTEL</div>
@@ -113,6 +114,52 @@
             <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 25px; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);">ЗАНЕСТИ В ЧС</button>
         </form>
         <button class="modal-btn-ghost" onclick="closeModal('blacklistModal')">Отмена</button>
+    </div>
+
+    <div class="modal dept-modal" id="deptModal">
+        <div class="modal-title" style="color: #5865F2; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
+            ЗАЯВКА В ОТДЕЛ
+        </div>
+        
+        <form id="deptForm">
+            <label>Выберите отдел</label>
+            <select id="deptSelect" required>
+                <option value="СИКАРИОС">СИКАРИОС</option>
+                <option value="ГБР">ГБР</option>
+            </select>
+
+            <div class="row-container">
+                <div class="input-half">
+                    <label>Имя Фамилия</label>
+                    <input type="text" id="deptName" placeholder="Имя Фамилия" required>
+                </div>
+                <div class="input-half">
+                    <label>Возраст (16+)</label>
+                    <input type="number" id="deptAge" placeholder="16" min="16" max="99" required>
+                </div>
+            </div>
+
+            <label>Почему именно вы?</label>
+            <textarea id="deptWhy" rows="3" placeholder="Ваши сильные стороны..." required></textarea>
+
+            <label>Средний онлайн в день</label>
+            <input type="text" id="deptOnline" placeholder="Напр: 4-6 часов" required>
+
+            <label>Откаты перестрелок (Ссылки)</label>
+            <input type="text" id="deptClips" placeholder="Imgur / YouTube / Medal" required>
+
+            <label>Опыт на других проектах</label>
+            <textarea id="deptExpProject" rows="2" placeholder="Где играли ранее?" required></textarea>
+
+            <label>Опыт в других фракциях/семьях</label>
+            <textarea id="deptExpFam" rows="2" placeholder="Кем были, чего добились?" required></textarea>
+
+            <label>Откаты с других серверов (Если есть)</label>
+            <input type="text" id="deptOtherClips" placeholder="Не обязательно">
+
+            <button type="submit" class="modal-btn" style="width: 100%; margin-top: 25px; background: #5865F2; color: white;">ОТПРАВИТЬ ЗАЯВКУ</button>
+        </form>
+        <button class="modal-btn-ghost" onclick="closeModal('deptModal')">Отмена</button>
     </div>
 
     <div class="modal" id="debugModal" style="max-width: 500px; text-align: left;">
