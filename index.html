@@ -22,15 +22,18 @@
 </div>
 
 <div class="form-card">
+    
+    <div class="top-nav">
+        <button class="nav-btn active" onclick="switchTab('report')">ОТЧЕТ</button>
+        <button class="nav-btn sicarios-btn" onclick="switchTab('sicarios')">S.I.C.A.R.I.O.S</button>
+    </div>
+
     <img src="" alt="ONYX Logo" class="logo-img" id="mainLogo">
     <div class="subtitle">THE ONYX CARTEL</div>
 
     <div id="loginContainer">
         <p class="login-text">Система повышения и отчетности<br>Требуется авторизация через Discord</p>
-        
-        <button class="btn-discord-big" onclick="loginDiscord()">
-            Войти через Discord
-        </button>
+        <button class="btn-discord-big" onclick="loginDiscord()">Войти через Discord</button>
     </div>
 
     <div id="formContainer">
@@ -59,15 +62,50 @@
             <input type="text" id="newRank" class="locked-input" readonly placeholder="Ожидание..." tabindex="-1">
 
             <label>Почему вас должны повысить?</label>
-            <textarea id="promoteReason" rows="5" placeholder="Опишите проделанную работу, ваши достижения и почему вы достойны нового ранга..." required></textarea>
+            <textarea id="promoteReason" rows="5" placeholder="Опишите проделанную работу..." required></textarea>
 
             <button type="submit" id="submitBtn" class="submit-btn">Отправить отчет</button>
         </form>
 
-        <div class="buttons-row">
-            <button class="btn-dept" onclick="openModal('deptModal')">📂 Подать заявку в отдел</button>
-            <button id="adminBlacklistBtn" class="btn-danger-onyx" style="display: none;" onclick="openModal('blacklistModal')">⚠️ Черный Список</button>
-        </div>
+        <button id="adminBlacklistBtn" class="btn-danger-onyx" style="display: none;" onclick="openModal('blacklistModal')">
+            ⚠️ Управление Черным Списком
+        </button>
+    </div>
+
+    <div id="sicariosContainer" style="display: none;">
+        <div class="sicarios-title">ЗАЯВКА В ОТДЕЛ</div>
+        <form id="sicariosForm">
+            <div class="row-container">
+                <div class="input-half">
+                    <label>Имя фамилия(в игре)</label>
+                    <input type="text" id="sicName" placeholder="Имя Фамилия" required>
+                </div>
+                <div class="input-half">
+                    <label>Возраст(от 16)</label>
+                    <input type="number" id="sicAge" placeholder="16" min="16" max="99" required>
+                </div>
+            </div>
+
+            <label>Почему вас именно должны выбрать</label>
+            <textarea id="sicWhy" rows="3" placeholder="Ваши сильные стороны..." required></textarea>
+
+            <label>Средний онлайн в день</label>
+            <input type="text" id="sicOnline" placeholder="Напр: 4-6 часов" required>
+
+            <label>Откаты перестрелок</label>
+            <input type="text" id="sicClips" placeholder="Ссылки (Imgur / YouTube)" required>
+
+            <label>Был ли опыт на других проектах (какой?)</label>
+            <textarea id="sicExpProj" rows="2" placeholder="Где играли ранее?" required></textarea>
+
+            <label>Опыт на других серверах в фракциях/семей</label>
+            <textarea id="sicExpFam" rows="2" placeholder="Кем были, чего добились?" required></textarea>
+
+            <label>Откаты с других серверов(если есть)</label>
+            <input type="text" id="sicOtherClips" placeholder="Не обязательно">
+
+            <button type="submit" class="submit-btn sicarios-submit">ОТПРАВИТЬ ЗАЯВКУ</button>
+        </form>
     </div>
 
     <div class="branding">© THE ONYX CARTEL</div>
@@ -114,52 +152,6 @@
             <button type="submit" class="modal-btn btn-error" style="width: 100%; margin-top: 25px; box-shadow: 0 0 15px rgba(255, 77, 77, 0.2);">ЗАНЕСТИ В ЧС</button>
         </form>
         <button class="modal-btn-ghost" onclick="closeModal('blacklistModal')">Отмена</button>
-    </div>
-
-    <div class="modal dept-modal" id="deptModal">
-        <div class="modal-title" style="color: #5865F2; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px;">
-            ЗАЯВКА В ОТДЕЛ
-        </div>
-        
-        <form id="deptForm">
-            <label>Выберите отдел</label>
-            <select id="deptSelect" required>
-                <option value="СИКАРИОС">СИКАРИОС</option>
-                <option value="ГБР">ГБР</option>
-            </select>
-
-            <div class="row-container">
-                <div class="input-half">
-                    <label>Имя Фамилия</label>
-                    <input type="text" id="deptName" placeholder="Имя Фамилия" required>
-                </div>
-                <div class="input-half">
-                    <label>Возраст (16+)</label>
-                    <input type="number" id="deptAge" placeholder="16" min="16" max="99" required>
-                </div>
-            </div>
-
-            <label>Почему именно вы?</label>
-            <textarea id="deptWhy" rows="3" placeholder="Ваши сильные стороны..." required></textarea>
-
-            <label>Средний онлайн в день</label>
-            <input type="text" id="deptOnline" placeholder="Напр: 4-6 часов" required>
-
-            <label>Откаты перестрелок (Ссылки)</label>
-            <input type="text" id="deptClips" placeholder="Imgur / YouTube / Medal" required>
-
-            <label>Опыт на других проектах</label>
-            <textarea id="deptExpProject" rows="2" placeholder="Где играли ранее?" required></textarea>
-
-            <label>Опыт в других фракциях/семьях</label>
-            <textarea id="deptExpFam" rows="2" placeholder="Кем были, чего добились?" required></textarea>
-
-            <label>Откаты с других серверов (Если есть)</label>
-            <input type="text" id="deptOtherClips" placeholder="Не обязательно">
-
-            <button type="submit" class="modal-btn" style="width: 100%; margin-top: 25px; background: #5865F2; color: white;">ОТПРАВИТЬ ЗАЯВКУ</button>
-        </form>
-        <button class="modal-btn-ghost" onclick="closeModal('deptModal')">Отмена</button>
     </div>
 
     <div class="modal" id="debugModal" style="max-width: 500px; text-align: left;">
