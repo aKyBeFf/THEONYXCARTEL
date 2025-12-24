@@ -109,7 +109,8 @@ function setupInputs() {
         const consoleDiv = document.getElementById('debugConsole');
         const rolesList = userMemberData ? userMemberData.roles : "Нет данных";
         const calculatedRank = document.getElementById('currentRank').value;
-        const sicariosStatus = localStorage.getItem(`sicarios_applied_${userData.id}`) ? "SENT" : "NOT SENT";
+        const sicKey = userData ? `onyx_sicarios_lock_${userData.id}` : null;
+        const sicariosStatus = (sicKey && localStorage.getItem(sicKey)) ? "SENT" : "NOT SENT";
         
         let debugText = `[INFO] User: ${userData.username} (${userData.id})\n`;
         debugText += `[ROLES] ${JSON.stringify(rolesList)}\n`;
@@ -293,27 +294,52 @@ function updateNextRank(currentVal) {
     }
 }
 
+function checkSpamProtection(type) {
+    if (isUserAdmin) return true;
+    if (!userData || !userData.id) return false;
+
+    if (type === 'report') {
+        const key = `onyx_cooldown_report_${userData.id}`;
+        const lastSubmit = localStorage.getItem(key);
+        if (lastSubmit) {
+            const timeDiff = Date.now() - parseInt(lastSubmit);
+            const cooldownTime = 60 * 60 * 1000;
+            if (timeDiff < cooldownTime) {
+                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
+                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
+                return false;
+            }
+        }
+    } else if (type === 'sicarios') {
+        const key = `onyx_sicarios_lock_${userData.id}`;
+        if (localStorage.getItem(key)) {
+            showError("Вы уже подавали заявку в S.I.C.A.R.I.O.S.");
+            return false;
+        }
+    }
+    return true;
+}
+
+function activateSpamProtection(type) {
+    if (isUserAdmin) return;
+    if (!userData || !userData.id) return;
+
+    if (type === 'report') {
+        localStorage.setItem(`onyx_cooldown_report_${userData.id}`, Date.now().toString());
+    } else if (type === 'sicarios') {
+        localStorage.setItem(`onyx_sicarios_lock_${userData.id}`, 'true');
+    }
+}
+
 document.getElementById('rankForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    if (!checkSpamProtection('report')) return;
+
     const passportId = document.getElementById('passportId').value; 
     if (passportId.length !== 7 || !passportId.includes('-')) {
         showError("ID Паспорта должен быть в формате XXX-XXX (например, 543-621)");
         return;
-    }
-
-    if (!isUserAdmin) {
-        const lastSubmit = localStorage.getItem('lastPromotionSubmit');
-        if (lastSubmit) {
-            const timeDiff = Date.now() - parseInt(lastSubmit);
-            const cooldownTime = 60 * 60 * 1000; 
-            
-            if (timeDiff < cooldownTime) {
-                const minutesLeft = Math.ceil((cooldownTime - timeDiff) / 60000);
-                showError(`Подождите ${minutesLeft} мин. перед повторной отправкой.`);
-                return;
-            }
-        }
     }
 
     if (!WEBHOOK_URL) { alert("Ошибка: Вебхук не настроен!"); return; }
@@ -352,9 +378,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
     .then(res => { 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
-            if (!isUserAdmin) {
-                localStorage.setItem('lastPromotionSubmit', Date.now().toString());
-            }
+            activateSpamProtection('report');
             document.getElementById('rankForm').reset(); 
             checkGuildRoles(localStorage.getItem('discord_token'), userData);
         } else { 
@@ -366,12 +390,7 @@ document.getElementById('rankForm').addEventListener('submit', function(e) {
 document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    if (!isUserAdmin) {
-        if (localStorage.getItem(`sicarios_applied_${userData.id}`)) {
-            showError("Вы уже подавали заявку в S.I.C.A.R.I.O.S.");
-            return;
-        }
-    }
+    if (!checkSpamProtection('sicarios')) return;
 
     if (!WEBHOOK_SICARIOS) { alert("Ошибка: Вебхук Сикариос не настроен!"); return; }
 
@@ -448,9 +467,7 @@ document.getElementById('sicariosForm').addEventListener('submit', function(e) {
     .then(res => { 
         if (res.ok || res.status === 204) { 
             openModal('successModal'); 
-            if (!isUserAdmin) {
-                localStorage.setItem(`sicarios_applied_${userData.id}`, 'true');
-            }
+            activateSpamProtection('sicarios');
             document.getElementById('sicariosForm').reset(); 
             document.getElementById('clipsContainer').innerHTML = `
                 <div class="link-row">
